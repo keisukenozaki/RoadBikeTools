@@ -105,5 +105,67 @@
 
       <p class="diagram-caption">※ 図はイメージです（実寸比ではありません）</p>
     </div>
+
+    <div class="knee-tune">
+      <h3>膝角度でさらに微調整</h3>
+
+      <p class="knee-tune-desc">
+        クランクを6時位置（ペダル最下点）にして、膝の曲がり具合を測ってみてください。目安は25〜35度です。
+      </p>
+
+      <div class="knee-diagram">
+        <svg viewBox="220 60 440 380" class="knee-diagram-svg">
+          <line x1="320" y1="230" x2="396.6" y2="383.1" class="dashed-ref" />
+
+          <line x1="250" y1="90" x2="320" y2="230" class="leg-line" />
+          <line x1="320" y1="230" x2="300" y2="400" class="leg-line" />
+
+          <path d="M333.4,256.8 A30,30 0 0,1 316.5,259.8" class="angle-arc" />
+          <text x="332" y="284" class="theta-label">θ</text>
+
+          <circle cx="250" cy="90" r="7" class="joint" />
+          <circle cx="320" cy="230" r="7" class="joint" />
+          <circle cx="300" cy="400" r="6" class="joint" />
+
+          <line x1="300" y1="340" x2="300" y2="400" class="crank-line" />
+          <circle cx="300" cy="340" r="8" class="pivot" />
+          <ellipse cx="300" cy="400" rx="16" ry="6" class="pivot" />
+
+          <line x1="325" y1="258" x2="440" y2="196" class="leader-line" />
+          <circle cx="325" cy="258" r="2" class="leader-dot" />
+          <text x="446" y="192" class="label-title">θ：膝の曲がり角度</text>
+          <text x="446" y="210" class="label-sub">目安は25〜35度</text>
+
+          <line x1="250" y1="90" x2="440" y2="90" class="leader-line" />
+          <circle cx="250" cy="90" r="2" class="leader-dot" />
+          <text x="446" y="94" class="label-title">股関節</text>
+
+          <line x1="300" y1="370" x2="440" y2="330" class="leader-line" />
+          <circle cx="300" cy="370" r="2" class="leader-dot" />
+          <text x="446" y="326" class="label-title">クランク位置</text>
+          <text x="446" y="344" class="label-sub">6時（真下）に合わせる</text>
+
+          <line x1="396.6" y1="383.1" x2="440" y2="412" class="leader-line" />
+          <circle cx="396.6" cy="383.1" r="2" class="leader-dot" />
+          <text x="446" y="416" class="label-sub">点線：伸ばした場合</text>
+        </svg>
+
+        <p class="diagram-caption">※ 図はイメージです（自転車の右側から見た図）</p>
+      </div>
+
+      <div class="form-group">
+        <label> 測定した膝の角度（度） </label>
+
+        <input type="number" inputmode="decimal" [(ngModel)]="kneeAngle" placeholder="例：32" />
+      </div>
+
+      <button class="calculate-button secondary" (click)="adjustByKneeAngle()">微調整を計算する</button>
+
+      <div class="knee-result" *ngIf="kneeAdjustmentMessage">
+        <p class="knee-message">{{ kneeAdjustmentMessage }}</p>
+
+        <p class="knee-suggested" *ngIf="kneeAdjustmentMm !== 0">調整後の目安：{{ suggestedHeight }} cm</p>
+      </div>
+    </div>
   </div>
 </div>
