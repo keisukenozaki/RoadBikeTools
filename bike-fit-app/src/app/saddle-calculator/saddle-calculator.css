@@ -1,0 +1,280 @@
+.container {
+  width: calc(100% - 32px);
+  max-width: 420px;
+  margin: 20px auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  box-sizing: border-box;
+
+  font-size: 18px;
+
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+/* iOSの入力ズーム防止 */
+input,
+button {
+  touch-action: manipulation;
+}
+
+button {
+  width: 100%;
+  height: 52px;
+
+  margin-top: 10px;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  color: white;
+  background-color: #1976d2;
+
+  border: none;
+  border-radius: 10px;
+
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.result {
+  margin-top: 30px;
+  padding: 20px;
+
+  text-align: center;
+
+  background: #f5f9ff;
+  border-radius: 12px;
+}
+
+.result h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.result p {
+  margin: 0;
+
+  font-size: 32px;
+  font-weight: bold;
+
+  color: #1976d2;
+}
+
+.error {
+  margin-top: 20px;
+
+  padding: 12px;
+
+  text-align: center;
+
+  color: #b00020;
+
+  background: #ffebee;
+
+  border-radius: 8px;
+}
+
+/* 小さいスマホ対応 */
+@media (max-width: 360px) {
+  .container {
+    width: calc(100% - 24px);
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  input,
+  button {
+    font-size: 16px;
+  }
+}
+
+.method-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.method-card {
+  width: 100%;
+
+  min-height: 72px;
+
+  padding: 14px 16px;
+
+  box-sizing: border-box;
+
+  text-align: left;
+
+  background: #ffffff;
+
+  color: #222222;
+
+  border: 2px solid #ddd;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.method-card.active {
+  border-color: #1976d2;
+
+  background: #eef6ff;
+
+  color: #1976d2;
+}
+
+.method-name {
+  font-size: 16px;
+
+  font-weight: bold;
+
+  line-height: 1.4;
+}
+
+.method-description {
+  margin-top: 4px;
+
+  font-size: 13px;
+
+  line-height: 1.4;
+
+  color: #666;
+}
+
+.method-card.active .method-description {
+  color: #555;
+}
+
+.diagram {
+  margin-top: 20px;
+}
+
+.bike-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.tire {
+  fill: none;
+  stroke: #2b2b2b;
+  stroke-width: 3;
+}
+
+.rim {
+  fill: none;
+  stroke: #bbb;
+  stroke-width: 1;
+}
+
+.hub {
+  fill: #555;
+}
+
+.spoke {
+  stroke: #ccc;
+  stroke-width: 1;
+}
+
+.ground {
+  stroke: #ddd;
+  stroke-width: 2;
+}
+
+.frame-line {
+  stroke: #1976d2;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.handlebar {
+  fill: none;
+  stroke: #1976d2;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.crank {
+  fill: #333;
+}
+
+.pedal-arm {
+  stroke: #333;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.seat-post {
+  fill: #555;
+  transition:
+    y 0.6s ease,
+    height 0.6s ease;
+}
+
+.saddle {
+  fill: #222222;
+  transition: cy 0.6s ease;
+}
+
+.measure-bar {
+  fill: rgba(176, 0, 32, 0.35);
+  transition:
+    y 0.6s ease,
+    height 0.6s ease;
+}
+
+.measure-tick {
+  stroke: #b00020;
+  stroke-width: 1.5;
+}
+
+.measure-label {
+  fill: #b00020;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.diagram-caption {
+  margin: 8px 0 0;
+  font-size: 11px;
+  text-align: center;
+  color: #999;
+}

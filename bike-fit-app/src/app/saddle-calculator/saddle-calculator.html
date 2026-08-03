@@ -1,0 +1,109 @@
+<div class="container">
+  <h1>サドル高計算</h1>
+
+  <div class="form-group">
+    <label> 計算方式 </label>
+
+    <div class="method-list">
+      <button
+        type="button"
+        class="method-card"
+        *ngFor="let method of methods"
+        [class.active]="calculationMethod === method.id"
+        (click)="calculationMethod = method.id"
+      >
+        <div class="method-name">
+          {{ method.name }}
+        </div>
+
+        <div class="method-description">
+          {{ method.description }}
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label> 股下長（cm） </label>
+
+    <input type="number" inputmode="decimal" [(ngModel)]="inseam" placeholder="例：78" />
+  </div>
+
+  <div class="form-group">
+    <label> クランク長（mm） </label>
+
+    <input type="number" inputmode="numeric" [(ngModel)]="crankLength" />
+  </div>
+
+  <button class="calculate-button" (click)="calculate()">計算する</button>
+
+  <div class="error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="result" *ngIf="saddleHeight">
+    <h2>推奨サドル高</h2>
+
+    <p>{{ saddleHeight }} cm</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 300 220" class="bike-svg">
+        <!-- 地面 -->
+        <line x1="10" y1="210" x2="290" y2="210" class="ground" />
+
+        <!-- 後輪（1.5倍サイズ） -->
+        <circle cx="75" cy="165" r="45" class="tire" />
+        <circle cx="75" cy="165" r="45" class="rim" />
+        <circle cx="75" cy="165" r="5" class="hub" />
+        <line x1="75" y1="123" x2="75" y2="207" class="spoke" />
+        <line x1="33" y1="165" x2="117" y2="165" class="spoke" />
+        <line x1="48" y1="135" x2="102" y2="195" class="spoke" />
+        <line x1="48" y1="195" x2="102" y2="135" class="spoke" />
+
+        <!-- 前輪（1.5倍サイズ） -->
+        <circle cx="225" cy="165" r="45" class="tire" />
+        <circle cx="225" cy="165" r="45" class="rim" />
+        <circle cx="225" cy="165" r="5" class="hub" />
+        <line x1="225" y1="123" x2="225" y2="207" class="spoke" />
+        <line x1="183" y1="165" x2="267" y2="165" class="spoke" />
+        <line x1="198" y1="135" x2="252" y2="195" class="spoke" />
+        <line x1="198" y1="195" x2="252" y2="135" class="spoke" />
+
+        <!-- フレーム（トップチューブは地面と水平） -->
+        <line x1="75" y1="165" x2="140" y2="172" class="frame-line" /><!-- チェーンステー -->
+        <line x1="75" y1="165" x2="118" y2="100" class="frame-line" /><!-- シートステー -->
+        <line x1="118" y1="100" x2="196" y2="100" class="frame-line" /><!-- トップチューブ（水平） -->
+        <line x1="140" y1="172" x2="118" y2="100" class="frame-line" /><!-- シートチューブ（固定） -->
+        <line x1="140" y1="172" x2="204" y2="122" class="frame-line" /><!-- ダウンチューブ -->
+        <line x1="196" y1="100" x2="204" y2="122" class="frame-line" /><!-- ヘッドチューブ（短め） -->
+        <line x1="204" y1="122" x2="225" y2="165" class="frame-line" /><!-- フォーク -->
+
+        <!-- ステム・ドロップハンドル -->
+        <line x1="196" y1="100" x2="213" y2="87" class="frame-line" />
+        <path d="M213,87 C224,83 229,89 224,98 C219,107 208,109 207,102" class="handlebar" />
+
+        <!-- クランク／ペダル -->
+        <circle cx="140" cy="172" r="7" class="crank" />
+        <line x1="140" y1="172" x2="158" y2="184" class="pedal-arm" />
+        <line x1="140" y1="172" x2="122" y2="160" class="pedal-arm" />
+
+        <!-- シートポスト（サドル高に応じて伸縮） -->
+        <rect x="116.5" width="3" rx="1.5" [attr.y]="seatTopY" [attr.height]="100 - seatTopY" class="seat-post" />
+
+        <!-- サドル（ロードバイク用の細長い形状） -->
+        <ellipse cx="118" rx="24" ry="3.5" [attr.cy]="seatTopY - 3" class="saddle" />
+
+        <!-- 計測バー -->
+        <rect x="148" width="3" [attr.y]="seatTopY" [attr.height]="172 - seatTopY" class="measure-bar" />
+        <line x1="140" x2="160" y1="172" y2="172" class="measure-tick" />
+        <line x1="140" x2="160" [attr.y1]="seatTopY" [attr.y2]="seatTopY" class="measure-tick" />
+
+        <text x="165" class="measure-label" [attr.y]="(172 + seatTopY) / 2 + 4">
+          {{ saddleHeight }} cm
+        </text>
+      </svg>
+
+      <p class="diagram-caption">※ 図はイメージです（実寸比ではありません）</p>
+    </div>
+  </div>
+</div>
