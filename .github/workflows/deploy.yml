@@ -2,11 +2,14 @@ name: Deploy to Xserver
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bike-fit-app
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
