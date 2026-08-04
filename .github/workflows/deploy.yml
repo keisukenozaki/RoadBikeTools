@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Build (production)
-        run: npx ng build --configuration production --base-href /
+        run: npx ng build --configuration production --base-href /bikefit/
 
       - name: Deploy to Xserver via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
