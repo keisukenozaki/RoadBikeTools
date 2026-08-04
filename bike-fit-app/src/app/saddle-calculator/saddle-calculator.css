@@ -82,7 +82,7 @@ button:active {
 .result p {
   margin: 0;
 
-  font-size: 32px;
+  font-size: 16px;
   font-weight: bold;
 
   color: #1976d2;
@@ -277,4 +277,121 @@ button:active {
   font-size: 11px;
   text-align: center;
   color: #999;
+}
+
+.knee-tune {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e8f5;
+  text-align: left;
+}
+
+.knee-tune h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #333;
+}
+
+.knee-tune-desc {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #666;
+}
+
+.calculate-button.secondary {
+  background-color: #ffffff;
+  color: #1976d2;
+  border: 2px solid #1976d2;
+}
+
+.knee-result {
+  margin-top: 16px;
+  padding: 14px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.knee-message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.knee-suggested {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.knee-diagram {
+  margin-bottom: 20px;
+}
+
+.knee-diagram-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.leg-line {
+  stroke: #1976d2;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.dashed-ref {
+  stroke: #bbbbbb;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.angle-arc {
+  fill: none;
+  stroke: #0d47a1;
+  stroke-width: 2.5;
+}
+
+.theta-label {
+  font-size: 16px;
+  font-weight: bold;
+  fill: #0d47a1;
+}
+
+.joint {
+  fill: #1976d2;
+}
+
+.crank-line {
+  stroke: #555555;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.pivot {
+  fill: #555555;
+}
+
+.leader-line {
+  stroke: #bbbbbb;
+  stroke-width: 0.75;
+  stroke-dasharray: 3 3;
+}
+
+.leader-dot {
+  fill: #999999;
+}
+
+.label-title {
+  font-size: 14px;
+  font-weight: bold;
+  fill: #333333;
+}
+
+.label-sub {
+  font-size: 12px;
+  fill: #666666;
 }
