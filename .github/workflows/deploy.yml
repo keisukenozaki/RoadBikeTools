@@ -29,5 +29,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
-          local-dir: ./dist/bike-fit-app/browser/
+          local-dir: ./bike-fit-app/dist/bike-fit-app/browser/
           server-dir: ${{ secrets.SERVER_DIR }}
