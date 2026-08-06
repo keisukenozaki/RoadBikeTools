@@ -1,6 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
+/** 履歴1件分のデータ構造 */
+interface HistoryEntry {
+  id: string;
+  dateLabel: string; // 表示用の日時文字列
+  methodName: string;
+  inseam: number;
+  crankLength: number;
+  saddleHeight: number;
+  kneeAdjustmentMm: number;
+  suggestedHeight: number;
+}
 
 @Component({
   selector: 'app-saddle-calculator',
@@ -9,7 +21,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './saddle-calculator.html',
   styleUrl: './saddle-calculator.css',
 })
-export class SaddleCalculator {
+export class SaddleCalculator implements OnInit {
   inseam = 0;
 
   crankLength = 170;
@@ -59,6 +71,95 @@ export class SaddleCalculator {
     },
   ];
 
+  // ---- ここから履歴機能 ----
+
+  /** localStorageに保存するときのキー名 */
+  private readonly HISTORY_STORAGE_KEY = 'bikefit-saddle-history';
+
+  /** 履歴として保持できる最大件数（増えすぎ防止） */
+  private readonly HISTORY_MAX_LENGTH = 20;
+
+  history: HistoryEntry[] = [];
+
+  ngOnInit(): void {
+    this.loadHistory();
+  }
+
+  /** ブラウザのlocalStorageから履歴を読み込む */
+  private loadHistory(): void {
+    try {
+      const raw = localStorage.getItem(this.HISTORY_STORAGE_KEY);
+      this.history = raw ? JSON.parse(raw) : [];
+    } catch {
+      // 壊れたデータが入っていた場合などは履歴なしとして扱う
+      this.history = [];
+    }
+  }
+
+  /** 現在のhistory配列をlocalStorageに書き込む */
+  private persistHistory(): void {
+    try {
+      localStorage.setItem(this.HISTORY_STORAGE_KEY, JSON.stringify(this.history));
+    } catch {
+      // 容量オーバーなど書き込み失敗時は静かに無視（履歴機能が使えないだけで、計算自体は継続できる）
+    }
+  }
+
+  /** 計算結果を履歴の先頭に追加して保存する */
+  private saveToHistory(methodName: string): void {
+    const entry: HistoryEntry = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      dateLabel: new Date().toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      methodName,
+      inseam: this.inseam,
+      crankLength: this.crankLength,
+      saddleHeight: this.saddleHeight,
+      kneeAdjustmentMm: this.kneeAdjustmentMm,
+      suggestedHeight: this.suggestedHeight,
+    };
+
+    this.history = [entry, ...this.history].slice(0, this.HISTORY_MAX_LENGTH);
+    this.persistHistory();
+  }
+
+  /** 膝角度の微調整結果を、直近の履歴エントリに反映して保存し直す */
+  private updateLatestHistoryWithKneeAdjustment(): void {
+    if (this.history.length === 0) {
+      return;
+    }
+
+    const [latest, ...rest] = this.history;
+
+    const updated: HistoryEntry = {
+      ...latest,
+      kneeAdjustmentMm: this.kneeAdjustmentMm,
+      suggestedHeight: this.suggestedHeight,
+    };
+
+    this.history = [updated, ...rest];
+    this.persistHistory();
+  }
+
+  /** 履歴を1件削除する */
+  removeHistoryEntry(id: string): void {
+    this.history = this.history.filter((entry) => entry.id !== id);
+    this.persistHistory();
+  }
+
+  /** 履歴を全件削除する */
+  clearHistory(): void {
+    this.history = [];
+    this.persistHistory();
+  }
+
+  // ---- ここまで履歴機能 ----
+
   calculate() {
     this.errorMessage = '';
 
@@ -95,6 +196,8 @@ export class SaddleCalculator {
     this.saddleHeight = Math.round(height * 10) / 10;
 
     this.seatTopY = this.mapHeightToY(this.saddleHeight);
+
+    this.saveToHistory(method.name);
   }
 
   /**
@@ -114,6 +217,8 @@ export class SaddleCalculator {
       this.kneeAdjustmentMm = 0;
       this.kneeAdjustmentMessage = '適正範囲内です。今の高さのままで問題ありません。';
 
+      this.updateLatestHistoryWithKneeAdjustment();
+
       return;
     }
 
@@ -126,6 +231,8 @@ export class SaddleCalculator {
     } else {
       this.kneeAdjustmentMessage = `膝が伸びすぎているようです。サドルを約 ${Math.abs(this.kneeAdjustmentMm)} mm 下げてみてください。`;
     }
+
+    this.updateLatestHistoryWithKneeAdjustment();
   }
 
   /** 膝角度の微調整を反映した、調整後のサドル高（cm） */
