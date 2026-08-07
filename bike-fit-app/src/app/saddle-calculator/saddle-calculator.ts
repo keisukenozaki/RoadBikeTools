@@ -6,11 +6,14 @@ import { CommonModule } from '@angular/common';
 interface HistoryEntry {
   id: string;
   dateLabel: string; // 表示用の日時文字列
+  methodId: string; // 復元時に計算方式を選択し直すためのID
   methodName: string;
   inseam: number;
   crankLength: number;
   saddleHeight: number;
+  kneeAngle: number | null;
   kneeAdjustmentMm: number;
+  kneeAdjustmentMessage: string;
   suggestedHeight: number;
 }
 
@@ -106,7 +109,7 @@ export class SaddleCalculator implements OnInit {
   }
 
   /** 計算結果を履歴の先頭に追加して保存する */
-  private saveToHistory(methodName: string): void {
+  private saveToHistory(method: { id: string; name: string }): void {
     const entry: HistoryEntry = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       dateLabel: new Date().toLocaleString('ja-JP', {
@@ -116,11 +119,14 @@ export class SaddleCalculator implements OnInit {
         hour: '2-digit',
         minute: '2-digit',
       }),
-      methodName,
+      methodId: method.id,
+      methodName: method.name,
       inseam: this.inseam,
       crankLength: this.crankLength,
       saddleHeight: this.saddleHeight,
+      kneeAngle: this.kneeAngle,
       kneeAdjustmentMm: this.kneeAdjustmentMm,
+      kneeAdjustmentMessage: this.kneeAdjustmentMessage,
       suggestedHeight: this.suggestedHeight,
     };
 
@@ -138,7 +144,9 @@ export class SaddleCalculator implements OnInit {
 
     const updated: HistoryEntry = {
       ...latest,
+      kneeAngle: this.kneeAngle,
       kneeAdjustmentMm: this.kneeAdjustmentMm,
+      kneeAdjustmentMessage: this.kneeAdjustmentMessage,
       suggestedHeight: this.suggestedHeight,
     };
 
@@ -156,6 +164,25 @@ export class SaddleCalculator implements OnInit {
   clearHistory(): void {
     this.history = [];
     this.persistHistory();
+  }
+
+  /**
+   * 履歴の1件をタップしたときに、その時の入力値・計算結果をフォームへ復元する。
+   * 新しい履歴として保存し直すことはしない（重複を避けるため）。
+   */
+  restoreFromHistory(entry: HistoryEntry): void {
+    this.inseam = entry.inseam;
+    this.crankLength = entry.crankLength;
+    this.calculationMethod = entry.methodId;
+
+    this.errorMessage = '';
+    this.saddleHeight = entry.saddleHeight;
+    this.seatTopY = this.mapHeightToY(entry.saddleHeight);
+
+    // 膝角度の微調整も、履歴に保存されていればそのまま復元する
+    this.kneeAngle = entry.kneeAngle;
+    this.kneeAdjustmentMm = entry.kneeAdjustmentMm;
+    this.kneeAdjustmentMessage = entry.kneeAdjustmentMessage;
   }
 
   // ---- ここまで履歴機能 ----
@@ -197,7 +224,7 @@ export class SaddleCalculator implements OnInit {
 
     this.seatTopY = this.mapHeightToY(this.saddleHeight);
 
-    this.saveToHistory(method.name);
+    this.saveToHistory(method);
   }
 
   /**

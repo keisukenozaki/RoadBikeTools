@@ -170,16 +170,36 @@
   </div>
 
   <!-- 計算結果の履歴 -->
-  <div class="history-section" *ngIf="history.length > 0">
+  <div class="history-section">
     <div class="history-header">
       <h3>計算履歴</h3>
-      <button type="button" class="clear-history-button" (click)="clearHistory()">全件削除</button>
+      <button
+        type="button"
+        class="clear-history-button"
+        *ngIf="history.length > 0"
+        (click)="clearHistory()"
+      >
+        全件削除
+      </button>
     </div>
 
-    <p class="history-note">※ この端末のブラウザ内にのみ保存されます（他の端末とは共有されません）</p>
+    <p class="history-note" *ngIf="history.length > 0">
+      ※ この端末のブラウザ内にのみ保存されます（他の端末とは共有されません）／タップすると入力値を復元します
+    </p>
 
-    <ul class="history-list">
-      <li class="history-item" *ngFor="let entry of history">
+    <p class="history-empty" *ngIf="history.length === 0">
+      まだ履歴がありません。計算すると、ここに表示されます。
+    </p>
+
+    <ul class="history-list" *ngIf="history.length > 0">
+      <li
+        class="history-item"
+        *ngFor="let entry of history"
+        role="button"
+        tabindex="0"
+        (click)="restoreFromHistory(entry)"
+        (keydown.enter)="restoreFromHistory(entry)"
+      >
         <div class="history-item-main">
           <div class="history-date">{{ entry.dateLabel }}</div>
           <div class="history-method">{{ entry.methodName }}</div>
@@ -187,6 +207,7 @@
 
         <div class="history-item-detail">
           股下 {{ entry.inseam }}cm ／ クランク {{ entry.crankLength }}mm
+          <span *ngIf="entry.kneeAngle !== null">／ 膝角度 {{ entry.kneeAngle }}°</span>
         </div>
 
         <div class="history-item-result">
@@ -199,7 +220,7 @@
         <button
           type="button"
           class="history-delete-button"
-          (click)="removeHistoryEntry(entry.id)"
+          (click)="removeHistoryEntry(entry.id); $event.stopPropagation()"
           aria-label="この履歴を削除"
         >
           ×
