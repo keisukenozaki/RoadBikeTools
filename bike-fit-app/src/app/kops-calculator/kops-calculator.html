@@ -22,6 +22,7 @@
     (mousemove)="onStageMouseMove($event)"
     (touchmove)="onStageTouchMove($event)"
     (mouseleave)="onStageLeave()"
+    (contextmenu)="$event.preventDefault()"
     >
     <div class="photo-placeholder" *ngIf="!photoDataUrl">
       <img
