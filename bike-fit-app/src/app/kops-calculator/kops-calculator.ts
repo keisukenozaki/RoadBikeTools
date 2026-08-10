@@ -198,11 +198,26 @@ export class KopsCalculator {
     };
   }
 
-  onStageClick(event: MouseEvent): void {
+  onStageMouseUp(event: MouseEvent): void {
+    this.finalizePoint(event.clientX, event.clientY);
+  }
+
+  onStageTouchEnd(event: TouchEvent): void {
+    // 指を離した瞬間の座標は changedTouches から取得する
+    const touch = event.changedTouches[0];
+    if (touch) {
+      this.finalizePoint(touch.clientX, touch.clientY);
+    }
+  }
+
+  /**
+   * スライドして指/マウスを離した瞬間に座標を決定する共通処理
+   */
+  private finalizePoint(clientX: number, clientY: number): void {
     if (!this.photoDataUrl || this.stepIndex >= this.steps.length) {
       return;
     }
-    const point = this.toStageCoords(event.clientX, event.clientY);
+    const point = this.toStageCoords(clientX, clientY);
     if (!point) {
       return;
     }
@@ -211,8 +226,10 @@ export class KopsCalculator {
     this.points[key] = point;
     this.stepIndex++;
 
+    // 指を離したタイミングでルーペを非表示にする
+    this.loupeVisible = false;
+
     if (this.stepIndex >= this.steps.length) {
-      this.loupeVisible = false;
       this.calculate();
     }
   }

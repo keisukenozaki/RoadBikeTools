@@ -17,11 +17,12 @@
   <div
     #stage
     class="photo-stage"
-    (click)="onStageClick($event)"
+    (mouseup)="onStageMouseUp($event)"
+    (touchend)="onStageTouchEnd($event)"
     (mousemove)="onStageMouseMove($event)"
     (touchmove)="onStageTouchMove($event)"
     (mouseleave)="onStageLeave()"
-  >
+    >
     <div class="photo-placeholder" *ngIf="!photoDataUrl">
       <img
         src="kops-example.jpg"
