@@ -2,10 +2,160 @@
   <h1>サドル前後位置（KOPS法）</h1>
 
   <p class="intro">
-    クランクを3時位置（水平・前側）にして、膝のお皿の下の骨（脛骨粗面）から下げ振りを垂らし、ペダル軸に対する前後のズレを測ります。
+    クランクを3時位置（水平・前側）にして横から撮影した写真をアップロードし、膝・ペダル軸・BB軸の3点をタップすると、サドルの前後位置のズレを自動で計算します。
   </p>
 
-  <div class="placeholder-note">
-    <p>この機能は準備中です。近日公開予定で～す。</p>
+  <div class="form-group">
+    <label>クランク長（mm）</label>
+    <input type="number" inputmode="numeric" [(ngModel)]="crankLength" placeholder="例：170" />
+  </div>
+
+  <div class="guide-banner" *ngIf="photoDataUrl">
+    {{ currentStepLabel }}
+  </div>
+
+  <div
+    #stage
+    class="photo-stage"
+    (click)="onStageClick($event)"
+    (mousemove)="onStageMouseMove($event)"
+    (touchmove)="onStageTouchMove($event)"
+    (mouseleave)="onStageLeave()"
+  >
+    <div class="photo-placeholder" *ngIf="!photoDataUrl">
+      <img
+        src="kops-example.jpg"
+        alt="撮影見本：真横から、クランクを3時（水平）にした状態の写真"
+        class="example-photo"
+      />
+
+      <p class="photo-placeholder-title">このような写真をアップロードしてください</p>
+      <p class="photo-placeholder-caption">
+        真横から、クランクを3時（水平・前側）にした状態で撮影してください。
+      </p>
+    </div>
+
+    <img
+      *ngIf="photoDataUrl"
+      [src]="photoDataUrl"
+      class="photo-image"
+      alt="サドル位置確認用の写真"
+      (load)="onPhotoLoad($event)"
+    />
+
+    <svg *ngIf="photoDataUrl" class="photo-overlay" viewBox="0 0 300 400" preserveAspectRatio="none">
+      <line
+        *ngIf="points.bb && points.pedal"
+        [attr.x1]="points.bb.x"
+        [attr.y1]="points.bb.y"
+        [attr.x2]="points.pedal.x"
+        [attr.y2]="points.pedal.y"
+        class="crank-guide-line"
+      />
+
+      <line
+        *ngIf="points.knee"
+        [attr.x1]="points.knee.x"
+        [attr.y1]="points.knee.y"
+        [attr.x2]="points.knee.x"
+        y2="400"
+        class="plumb-line"
+      />
+
+      <ng-container *ngIf="points.knee">
+        <circle [attr.cx]="points.knee.x" [attr.cy]="points.knee.y" r="6" class="marker-knee" />
+        <text [attr.x]="points.knee.x + 10" [attr.y]="points.knee.y - 6" class="marker-label marker-label-knee">膝</text>
+      </ng-container>
+
+      <ng-container *ngIf="points.pedal">
+        <circle [attr.cx]="points.pedal.x" [attr.cy]="points.pedal.y" r="6" class="marker-pedal" />
+        <text [attr.x]="points.pedal.x + 10" [attr.y]="points.pedal.y - 6" class="marker-label marker-label-pedal">ペダル軸</text>
+      </ng-container>
+
+      <ng-container *ngIf="points.bb">
+        <circle [attr.cx]="points.bb.x" [attr.cy]="points.bb.y" r="6" class="marker-bb" />
+        <text [attr.x]="points.bb.x + 10" [attr.y]="points.bb.y - 6" class="marker-label marker-label-bb">BB軸</text>
+      </ng-container>
+    </svg>
+
+    <div
+      class="loupe"
+      *ngIf="loupeVisible"
+      [style.left.px]="loupeLeft"
+      [style.top.px]="loupeTop"
+      [style.background-image]="'url(' + photoDataUrl + ')'"
+      [style.background-size]="loupeBgSize"
+      [style.background-position]="loupeBgPosition"
+    ></div>
+  </div>
+
+  <div class="photo-actions">
+    <label class="upload-button">
+      写真を選ぶ
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+    </label>
+
+    <button type="button" class="reset-button" (click)="resetAll()">リセット</button>
+  </div>
+
+  <p class="calibration-note" *ngIf="calibrationNote">{{ calibrationNote }}</p>
+
+  <div class="error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="result" *ngIf="offsetMm !== null">
+    <h2>水平オフセット</h2>
+    <p class="offset-value">{{ offsetMm > 0 ? '+' : '' }}{{ offsetMm }} mm</p>
+
+    <p
+      class="kops-badge"
+      [class.kops-badge-ok]="judgementStatus === 'ok'"
+      [class.kops-badge-warn]="judgementStatus !== 'ok'"
+    >
+      {{ judgementMessage }}
+    </p>
+  </div>
+
+  <!-- 計算結果の履歴 -->
+  <div class="history-section">
+    <div class="history-header">
+      <h3>計算履歴</h3>
+      <button type="button" class="clear-history-button" *ngIf="history.length > 0" (click)="clearHistory()">
+        全件削除
+      </button>
+    </div>
+
+    <p class="history-note" *ngIf="history.length > 0">
+      ※ この端末のブラウザ内にのみ保存されます（写真自体は保存されません）
+    </p>
+
+    <p class="history-empty" *ngIf="history.length === 0">
+      まだ履歴がありません。計算すると、ここに表示されます。
+    </p>
+
+    <ul class="history-list" *ngIf="history.length > 0">
+      <li class="history-item" *ngFor="let entry of history">
+        <div class="history-item-main">
+          <div class="history-date">{{ entry.dateLabel }}</div>
+          <div class="history-method">クランク {{ entry.crankLength }}mm</div>
+        </div>
+
+        <div class="history-item-result">
+          オフセット：<strong>{{ entry.offsetMm > 0 ? '+' : '' }}{{ entry.offsetMm }} mm</strong>
+        </div>
+
+        <div class="history-item-detail">{{ entry.judgementMessage }}</div>
+
+        <button
+          type="button"
+          class="history-delete-button"
+          (click)="removeHistoryEntry(entry.id); $event.stopPropagation()"
+          aria-label="この履歴を削除"
+        >
+          ×
+        </button>
+      </li>
+    </ul>
   </div>
 </div>
