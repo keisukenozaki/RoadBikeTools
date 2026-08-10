@@ -78,6 +78,10 @@ button {
 
   cursor: crosshair;
   touch-action: none;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;  
 }
 
 .photo-placeholder {
@@ -86,6 +90,9 @@ button {
   align-items: center;
   padding: 16px;
   box-sizing: border-box;
+
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .example-photo {
