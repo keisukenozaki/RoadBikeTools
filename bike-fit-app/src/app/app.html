@@ -1,1 +1,48 @@
-<app-saddle-calculator></app-saddle-calculator>
+<header class="app-header">
+  <button
+    type="button"
+    class="hamburger-button"
+    (click)="toggleMenu()"
+    [attr.aria-expanded]="isMenuOpen"
+    aria-label="メニューを開く"
+  >
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+
+  <span class="app-title">バイクフィット計算</span>
+</header>
+
+<div class="drawer-overlay" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
+
+<nav class="drawer" [class.open]="isMenuOpen">
+  <div class="drawer-header">
+    <span class="drawer-title">メニュー</span>
+    <button
+      type="button"
+      class="drawer-close-button"
+      (click)="closeMenu()"
+      aria-label="メニューを閉じる"
+    >
+      ×
+    </button>
+  </div>
+
+  <ul class="drawer-list">
+    <li *ngFor="let link of navLinks">
+      <a
+        [routerLink]="link.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeMenu()"
+      >
+        {{ link.label }}
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<main class="app-main">
+  <router-outlet></router-outlet>
+</main>
