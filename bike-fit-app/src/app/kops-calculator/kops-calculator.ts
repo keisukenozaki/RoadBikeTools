@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -86,7 +86,7 @@ export class KopsCalculator {
 
   history: KopsHistoryEntry[] = [];
 
-  constructor() {
+  constructor(private cdr: ChangeDetectorRef) {
     this.loadHistory();
   }
 
@@ -167,6 +167,7 @@ export class KopsCalculator {
     reader.onload = () => {
       this.photoDataUrl = reader.result as string;
       this.resetPoints();
+      this.cdr.detectChanges();
     };
     reader.onerror = () => {
       this.errorMessage = '写真の読み込みに失敗しました。もう一度お試しください。';
