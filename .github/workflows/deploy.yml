@@ -1,4 +1,4 @@
-name: Deploy to Xserver
+name: Deploy to Xserver (develop)
 
 on:
   push:
@@ -24,10 +24,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build (production)
-        run: npx ng build --configuration production --base-href /bikefit/
+      - name: Build (develop/test)
+        run: npx ng build --configuration production --base-href /bikefit-dev/
 
-      - name: Deploy to Xserver via FTPS
+      - name: Deploy to Xserver via FTPS (develop環境)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -35,4 +35,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: ./bike-fit-app/dist/bike-fit-app/browser/
-          server-dir: ${{ secrets.SERVER_DIR }}
+          server-dir: ${{ secrets.SERVER_DIR_DEV }}
