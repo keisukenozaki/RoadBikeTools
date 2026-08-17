@@ -10,8 +10,18 @@
     <input type="number" inputmode="numeric" [(ngModel)]="crankLength" placeholder="例：170" />
   </div>
 
-  <div class="guide-banner" *ngIf="photoDataUrl">
-    {{ currentStepLabel }}
+  <div class="guide-row" *ngIf="photoDataUrl">
+    <div class="guide-banner">{{ currentStepLabel }}</div>
+
+    <button
+      type="button"
+      class="undo-button"
+      *ngIf="canUndo"
+      (click)="undoLastPoint()"
+      aria-label="ひとつ前の点に戻る"
+    >
+      ↩ 戻る
+    </button>
   </div>
 
   <div

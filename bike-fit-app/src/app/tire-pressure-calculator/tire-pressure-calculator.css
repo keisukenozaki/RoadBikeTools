@@ -1,0 +1,244 @@
+.container {
+  width: calc(100% - 32px);
+  max-width: 420px;
+  margin: 20px auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  height: 48px;
+  padding: 0 12px;
+  box-sizing: border-box;
+
+  font-size: 18px;
+
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+input,
+button {
+  touch-action: manipulation;
+}
+
+button {
+  width: 100%;
+  height: 52px;
+
+  margin-top: 10px;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  color: white;
+  background-color: #1976d2;
+
+  border: none;
+  border-radius: 10px;
+
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 360px) {
+  .container {
+    width: calc(100% - 24px);
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  input,
+  button {
+    font-size: 16px;
+  }
+}
+
+/* 方式カード（路面タイプ・タイヤ種別の選択で共通利用） */
+.method-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.method-card {
+  width: 100%;
+  min-height: 72px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+
+  text-align: left;
+
+  background: #ffffff;
+  color: #222222;
+
+  border: 2px solid #ddd;
+  border-radius: 12px;
+
+  font-size: 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  cursor: pointer;
+
+  margin-top: 0;
+}
+
+.method-card.active {
+  border-color: #1976d2;
+  background: #eef6ff;
+  color: #1976d2;
+}
+
+.method-name {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.method-description {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #666;
+}
+
+.method-card.active .method-description {
+  color: #555;
+}
+
+/* チェックボックス */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 0;
+
+  font-size: 15px;
+  font-weight: normal;
+
+  cursor: pointer;
+}
+
+.checkbox-label input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+
+  accent-color: #1976d2;
+}
+
+/* エラー */
+.error {
+  margin-top: 20px;
+  padding: 12px;
+
+  text-align: center;
+  color: #b00020;
+
+  background: #ffebee;
+  border-radius: 8px;
+}
+
+/* 結果 */
+.result {
+  margin-top: 30px;
+  padding: 20px;
+
+  text-align: center;
+
+  background: #f5f9ff;
+  border-radius: 12px;
+}
+
+.result h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.pressure-row {
+  display: flex;
+  gap: 12px;
+}
+
+.pressure-item {
+  flex: 1;
+
+  padding: 14px 8px;
+
+  background: #ffffff;
+  border-radius: 10px;
+}
+
+.pressure-label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #666;
+}
+
+.pressure-value {
+  margin-top: 4px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.pressure-bar {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #999;
+}
+
+.hookless-note {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+  color: #b00020;
+
+  background: #ffebee;
+  border-radius: 8px;
+}
+
+.result-caution {
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: left;
+  color: #999;
+}
