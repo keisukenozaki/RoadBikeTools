@@ -49,8 +49,16 @@ button {
   touch-action: manipulation;
 }
 
-.guide-banner {
+.guide-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
   margin-bottom: 10px;
+}
+
+.guide-banner {
+  flex: 1;
+
   padding: 10px 12px;
 
   font-size: 14px;
@@ -60,6 +68,32 @@ button {
   color: #1976d2;
   background: #eef6ff;
   border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.undo-button {
+  flex-shrink: 0;
+
+  padding: 0 14px;
+  margin-top: 0;
+
+  font-size: 13px;
+  font-weight: bold;
+
+  color: #1976d2;
+  background-color: #ffffff;
+
+  border: 2px solid #1976d2;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.undo-button:active {
+  transform: scale(0.96);
 }
 
 .photo-stage {
