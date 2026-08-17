@@ -13,8 +13,11 @@ export class App {
   isMenuOpen = false;
 
   readonly navLinks = [
-    { path: '/', label: 'サドル高計算' },
+    { path: '/', label: 'ホーム' },
+    { path: '/saddle-height', label: 'サドル高計算' },
     { path: '/kops', label: 'サドル前後位置（KOPS法）' },
+    { path: '/tire-pressure', label: 'タイヤ空気圧計算' },
+    { path: '/formulas', label: '計算式について' },
   ];
 
   toggleMenu(): void {

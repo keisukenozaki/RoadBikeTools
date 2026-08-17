@@ -16,13 +16,19 @@
   height: 56px;
   padding: 0 16px;
 
-  background: #1976d2;
+  background: #46bcb6;
   color: #ffffff;
 }
 
 .app-title {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: bold;
+}
+
+.app-logo {
+  height: 32px;
+  width: auto;
+  display: block;
 }
 
 .hamburger-button {

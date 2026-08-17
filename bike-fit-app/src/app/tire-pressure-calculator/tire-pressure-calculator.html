@@ -1,0 +1,98 @@
+<div class="container">
+  <h1>タイヤ空気圧計算</h1>
+
+  <div class="form-group">
+    <label>体重（kg）</label>
+    <input type="number" inputmode="decimal" [(ngModel)]="riderWeightKg" placeholder="例：65" />
+  </div>
+
+  <div class="form-group">
+    <label>自転車＋装備の重量（kg）</label>
+    <input type="number" inputmode="decimal" [(ngModel)]="bikeWeightKg" placeholder="例：9" />
+  </div>
+
+  <div class="form-group">
+    <label>タイヤ幅（mm）</label>
+    <input type="number" inputmode="numeric" [(ngModel)]="tireWidthMm" placeholder="例：28" />
+  </div>
+
+  <div class="form-group">
+    <label>路面タイプ</label>
+
+    <div class="method-list">
+      <button
+        type="button"
+        class="method-card"
+        *ngFor="let option of surfaceOptions"
+        [class.active]="surface === option.id"
+        (click)="surface = option.id"
+      >
+        <div class="method-name">{{ option.name }}</div>
+        <div class="method-description">{{ option.description }}</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>タイヤの種類</label>
+
+    <div class="method-list">
+      <button
+        type="button"
+        class="method-card"
+        *ngFor="let option of tireTypeOptions"
+        [class.active]="tireType === option.id"
+        (click)="tireType = option.id"
+      >
+        <div class="method-name">{{ option.name }}</div>
+        <div class="method-description">{{ option.description }}</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-group checkbox-group">
+    <label class="checkbox-label">
+      <input type="checkbox" [(ngModel)]="isWet" />
+      濡れた路面を走る予定がある
+    </label>
+  </div>
+
+  <div class="form-group checkbox-group">
+    <label class="checkbox-label">
+      <input type="checkbox" [(ngModel)]="isHookless" />
+      フックレスリムを使用している
+    </label>
+  </div>
+
+  <button class="calculate-button" (click)="calculate()">計算する</button>
+
+  <div class="error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="result" *ngIf="frontPsi && rearPsi">
+    <h2>推奨タイヤ空気圧</h2>
+
+    <div class="pressure-row">
+      <div class="pressure-item">
+        <div class="pressure-label">前輪</div>
+        <div class="pressure-value">{{ frontPsi }} psi</div>
+        <div class="pressure-bar">（{{ toBar(frontPsi) }} bar）</div>
+      </div>
+
+      <div class="pressure-item">
+        <div class="pressure-label">後輪</div>
+        <div class="pressure-value">{{ rearPsi }} psi</div>
+        <div class="pressure-bar">（{{ toBar(rearPsi) }} bar）</div>
+      </div>
+    </div>
+
+    <p class="hookless-note" *ngIf="cappedByHookless">
+      ※ フックレスリムの上限（72.5psi / 5bar）に合わせて頭打ちにしています。本来の計算値はこれより高めです。
+    </p>
+
+    <p class="result-caution">
+      ※ これはあくまで出発点の目安です。実際にはタイヤ・リムの取扱説明書に記載の上限を必ず確認し、体感に合わせて微調整してください。
+    </p>
+  </div>
+</div>

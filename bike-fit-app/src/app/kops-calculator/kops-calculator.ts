@@ -154,6 +154,44 @@ export class KopsCalculator {
     return !!(this.points.knee && this.points.pedal && this.points.bb);
   }
 
+  /** ひとつ前の点に戻せるかどうか（写真がある & 1点以上確定済み） */
+  get canUndo(): boolean {
+    return !!this.photoDataUrl && this.stepIndex > 0;
+  }
+
+  /**
+   * 直前に確定した点を取り消して、1つ前のステップに戻る。
+   * 3点すべて確定済み（＝計算済み）の状態から戻る場合は、
+   * その時点の計算結果と、自動保存された履歴の最新1件も一緒に取り消す。
+   */
+  undoLastPoint(): void {
+    if (!this.canUndo) {
+      return;
+    }
+
+    const wasComplete = this.stepIndex >= this.steps.length;
+
+    this.stepIndex--;
+    const key = this.steps[this.stepIndex].key;
+    this.points[key] = null;
+
+    if (wasComplete) {
+      // calculate()がsaveToHistory()まで実行済みのため、その1件を取り消す
+      if (this.history.length > 0) {
+        this.history = this.history.slice(1);
+        this.persistHistory();
+      }
+
+      this.offsetMm = null;
+      this.judgementMessage = '';
+      this.judgementStatus = null;
+      this.calibrationNote = '';
+    }
+
+    this.errorMessage = '';
+    this.loupeVisible = false;
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
