@@ -29,6 +29,8 @@
   height: 32px;
   width: auto;
   display: block;
+
+  margin-left: auto;
 }
 
 .hamburger-button {
