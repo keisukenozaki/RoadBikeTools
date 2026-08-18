@@ -108,6 +108,52 @@
   color: #666;
 }
 
+/* 注意書き（目安であること・微調整の必要性） */
+.note-box {
+  margin-top: 24px;
+  padding: 14px 16px;
+
+  background: #fff8e1;
+  border-radius: 12px;
+  border-left: 4px solid #f5a623;
+}
+
+.note-box p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #7a5c15;
+}
+
+/* 計算式の面白さを伝えるトリビア */
+.trivia-box {
+  margin-top: 14px;
+  padding: 14px 16px;
+
+  background: #f5f9ff;
+  border-radius: 12px;
+}
+
+.trivia-box p {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #555;
+}
+
+.trivia-link {
+  display: inline-block;
+
+  font-size: 13px;
+  font-weight: bold;
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.trivia-link:active {
+  opacity: 0.7;
+}
+
 @media (max-width: 360px) {
   .container {
     width: calc(100% - 24px);

@@ -27,8 +27,8 @@ export class Home {
     {
       path: '/kops',
       name: 'サドル前後位置（KOPS法）',
-      description: '下げ振りを使った伝統的な方法で、サドルの前後位置の目安を計算します。',
-      ready: false,
+      description: '写真の3点をタップして、サドルの前後位置のズレを計算します。',
+      ready: true,
     },
     {
       path: '/tire-pressure',

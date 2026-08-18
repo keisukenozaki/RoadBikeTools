@@ -7,7 +7,13 @@
 
   <div class="form-group">
     <label>クランク長（mm）</label>
-    <input type="number" inputmode="numeric" [(ngModel)]="crankLength" placeholder="例：170" />
+    <input
+      type="number"
+      inputmode="numeric"
+      [(ngModel)]="crankLength"
+      (change)="onCrankLengthChange()"
+      placeholder="例：170"
+    />
   </div>
 
   <div class="guide-row" *ngIf="photoDataUrl">
