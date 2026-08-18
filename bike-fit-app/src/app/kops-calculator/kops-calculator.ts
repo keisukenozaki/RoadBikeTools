@@ -154,6 +154,16 @@ export class KopsCalculator {
     return !!(this.points.knee && this.points.pedal && this.points.bb);
   }
 
+  /**
+   * クランク長の入力欄が変更されたときのハンドラー（入力を終えて確定したタイミングで発火）。
+   * 3点がすでに確定済み（＝計算済み）であれば、新しいクランク長で再計算する。
+   */
+  onCrankLengthChange(): void {
+    if (this.allPointsSet) {
+      this.calculate();
+    }
+  }
+
   /** ひとつ前の点に戻せるかどうか（写真がある & 1点以上確定済み） */
   get canUndo(): boolean {
     return !!this.photoDataUrl && this.stepIndex > 0;
