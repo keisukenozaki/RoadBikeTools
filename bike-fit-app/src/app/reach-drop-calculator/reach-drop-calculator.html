@@ -1,0 +1,153 @@
+<div class="container">
+  <h1>ハンドル・ステム（リーチ・ドロップ）</h1>
+
+  <p class="intro">
+    リーチ（サドル先端〜ハンドル中心の水平距離）とドロップ（サドル〜ハンドルの高低差）の目安を計算します。この分野は個人の柔軟性や好みによる差がとても大きく、確立した計算式が存在しません。ここで出す数値は<strong>出発点の目安</strong>として捉えてください。
+  </p>
+
+  <div class="diagram-block">
+    <img
+      src="reach-drop-diagram.jpg"
+      alt="ロードバイクの側面写真に、サドルセットバック・リーチ（水平）・ドロップ・直線距離の測定箇所を矢印で示した図"
+      class="diagram-image"
+    />
+    <p class="diagram-caption">
+      各項目の測り方のイメージです。BB軸を基準に、サドルセットバック・リーチ（水平）・ドロップ・直線距離の関係を示しています。
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label>身長（cm）</label>
+    <input type="number" inputmode="decimal" [(ngModel)]="heightCm" placeholder="例：170" />
+  </div>
+
+  <div class="form-group">
+    <label>胴の長さ（cm）</label>
+    <input type="number" inputmode="decimal" [(ngModel)]="torsoLengthCm" placeholder="例：55" />
+    <p class="field-note">
+      サドルの座面から、胸骨の上（鎖骨の間のくぼみ）までの高さです。自転車に座り、上体を起こした状態で垂直に測ってください。
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label>腕の長さ（cm）</label>
+    <input type="number" inputmode="decimal" [(ngModel)]="armLengthCm" placeholder="例：60" />
+    <p class="field-note">
+      肩の付け根の骨（肩峰）から、手首の骨の出っ張り（尺骨茎状突起）までの長さです。腕を自然に体の横に下げた状態で測ってください。
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label>サドルセットバック（mm）</label>
+    <input type="number" inputmode="numeric" [(ngModel)]="saddleSetbackMm" placeholder="例：50" />
+    <p class="field-note">
+      BB軸からサドル先端までの水平距離です。BB軸より後ろがプラス方向、前がマイナス方向です。サドルの水平位置を変えた場合は、必ずこの値を更新してください。
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label>乗り方スタイル</label>
+
+    <div class="method-list">
+      <button
+        type="button"
+        class="method-card"
+        *ngFor="let option of styleOptions"
+        [class.active]="ridingStyle === option.id"
+        (click)="ridingStyle = option.id"
+      >
+        <div class="method-name">{{ option.name }}</div>
+        <div class="method-description">{{ option.description }}</div>
+      </button>
+    </div>
+  </div>
+
+  <button class="calculate-button" (click)="calculate()">計算する</button>
+
+  <div class="error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="result" *ngIf="reachRangeMm && dropRangeCm">
+    <h2>リーチ・ドロップの目安</h2>
+
+    <div class="diagonal-highlight" *ngIf="diagonalRangeMm">
+      <div class="diagonal-label">サドル先端〜ハンドル、直線距離</div>
+      <div class="diagonal-value">{{ diagonalRangeMm.min }}〜{{ diagonalRangeMm.max }} mm</div>
+    </div>
+
+    <div class="range-row">
+      <div class="range-item">
+        <div class="range-label">リーチ（水平）</div>
+        <div class="range-value">{{ reachRangeMm.min }}〜{{ reachRangeMm.max }} mm</div>
+      </div>
+
+      <div class="range-item">
+        <div class="range-label">ドロップ</div>
+        <div class="range-value">{{ dropRangeCm.min }}〜{{ dropRangeCm.max }} cm</div>
+      </div>
+    </div>
+
+    <p class="result-caution">
+      ※ どちらも出発点の目安です。肘の曲がり具合（60〜70度が目安）や、長時間乗ったときの首・肩・腰の疲労感を見ながら、ステム長やスペーサーで微調整してください。
+    </p>
+  </div>
+
+  <!-- 計算結果の履歴 -->
+  <div class="history-section">
+    <div class="history-header">
+      <h3>計算履歴</h3>
+      <button
+        type="button"
+        class="clear-history-button"
+        *ngIf="history.length > 0"
+        (click)="clearHistory()"
+      >
+        全件削除
+      </button>
+    </div>
+
+    <p class="history-note" *ngIf="history.length > 0">
+      ※ この端末のブラウザ内にのみ保存されます（他の端末とは共有されません）／タップすると入力値を復元します
+    </p>
+
+    <p class="history-empty" *ngIf="history.length === 0">
+      まだ履歴がありません。計算すると、ここに表示されます。
+    </p>
+
+    <ul class="history-list" *ngIf="history.length > 0">
+      <li
+        class="history-item"
+        *ngFor="let entry of history"
+        role="button"
+        tabindex="0"
+        (click)="restoreFromHistory(entry)"
+        (keydown.enter)="restoreFromHistory(entry)"
+      >
+        <div class="history-item-main">
+          <div class="history-date">{{ entry.dateLabel }}</div>
+          <div class="history-method">{{ entry.ridingStyleName }}</div>
+        </div>
+
+        <div class="history-item-detail">
+          身長 {{ entry.heightCm }}cm ／ 胴 {{ entry.torsoLengthCm }}cm ／ 腕 {{ entry.armLengthCm }}cm ／ セットバック
+          {{ entry.saddleSetbackMm }}mm
+        </div>
+
+        <div class="history-item-result">
+          直線距離：<strong>{{ entry.diagonalRangeMm.min }}〜{{ entry.diagonalRangeMm.max }} mm</strong>
+        </div>
+
+        <button
+          type="button"
+          class="history-delete-button"
+          (click)="removeHistoryEntry(entry.id); $event.stopPropagation()"
+          aria-label="この履歴を削除"
+        >
+          ×
+        </button>
+      </li>
+    </ul>
+  </div>
+
+</div>

@@ -37,6 +37,12 @@ export class Home {
       ready: true,
     },
     {
+      path: '/reach-drop',
+      name: 'ハンドル・ステム（リーチ・ドロップ）',
+      description: '身長・腕の長さ・乗り方のスタイルから、リーチとドロップの目安を範囲で計算します。',
+      ready: true,
+    },
+    {
       path: '/formulas',
       name: '計算式について',
       description: 'このアプリで使っている計算式が、誰によって・いつごろ生まれたものなのかをまとめました。',

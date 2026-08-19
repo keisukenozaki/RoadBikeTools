@@ -17,6 +17,7 @@ export class App {
     { path: '/saddle-height', label: 'サドル高計算' },
     { path: '/kops', label: 'サドル前後位置（KOPS法）' },
     { path: '/tire-pressure', label: 'タイヤ空気圧計算' },
+    { path: '/reach-drop', label: 'ハンドル・ステム（リーチ・ドロップ）' },
     { path: '/formulas', label: '計算式について' },
   ];
 
