@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -39,7 +39,7 @@ interface HistoryEntry {
 })
 export class HillclimbCalculator implements OnInit {
   private http = inject(HttpClient);
-  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   presetCourses = PRESET_COURSES;
   selectedSegmentId = '';
@@ -101,20 +101,21 @@ export class HillclimbCalculator implements OnInit {
     this.http.get<{ name: string; distanceKm: number; elevationGainM: number }>(phpApiUrl)
       .subscribe({
         next: (res) => {
-          // 取得データをプロパティへ反映（画面の入力欄にも自動反映される）
-          this.distanceKm = res.distanceKm;
-          this.elevationGainM = res.elevationGainM;
-          this.selectedCourseName = res.name || '選択コース';
-          this.isLoadingCourse = false;
+          setTimeout(() => {
+            this.ngZone.run(() => {
+              this.distanceKm = res.distanceKm;
+              this.elevationGainM = res.elevationGainM;
+              this.selectedCourseName = res.name || '選択コース';
+              this.isLoadingCourse = false;
 
-          // 距離・標高差が入ったのでその場でタイム予測を実行
-          this.calculate();
-          this.cdr.detectChanges();
+              // 値が確実にセットされた後に計算実行
+              this.calculate();
+            });
+          }, 0);
         },
         error: () => {
           this.errorMessage = 'コースデータの取得に失敗しました。';
           this.isLoadingCourse = false;
-          this.cdr.detectChanges();
         }
       });
   }
