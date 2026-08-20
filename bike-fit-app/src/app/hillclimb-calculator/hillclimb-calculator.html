@@ -121,14 +121,14 @@
       >
         <div class="history-item-main">
           <span class="history-date">{{ item.dateLabel }}</span>
-          <span class="history-method">{{ item.timeLabel }}</span>
+          <span class="history-method">{{ item.courseName }}</span>
         </div>
         <div class="history-item-detail">
           {{ item.riderWeightKg }}kg + {{ item.bikeWeightKg }}kg / {{ item.powerWatts }}W
           ({{ item.distanceKm }}km / {{ item.elevationGainM }}m / {{ item.gradientPercent }}%)
         </div>
         <div class="history-item-result">
-          VAM: {{ item.vam }} m/h（{{ item.tierLabel }}）
+          {{ item.timeLabel }}／VAM: {{ item.vam }} m/h（{{ item.tierLabel }}）
         </div>
         <button
           type="button"

@@ -2,6 +2,15 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
+// 設定ファイルの読み込み
+$configFile = __DIR__ . '/config.php';
+if (!file_exists($configFile)) {
+    http_response_code(500);
+    echo json_encode(["error" => "設定ファイル(config.php)が存在しません"]);
+    exit;
+}
+$config = require $configFile;
+
 $segmentId = $_GET['id'] ?? '';
 
 if (empty($segmentId) || !ctype_digit($segmentId)) {
@@ -11,16 +20,16 @@ if (empty($segmentId) || !ctype_digit($segmentId)) {
 }
 
 // --- DB接続設定 ---
-$dbHost = 'localhost';
-$dbName = 'hifive_animalland';
-$dbUser = 'hifive_system';
-$dbPass = 'Katan20010303!';
-
 try {
-    $pdo = new PDO("mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    $pdo = new PDO(
+        "mysql:host={$config['db']['host']};dbname={$config['db']['name']};charset=utf8mb4",
+        $config['db']['user'],
+        $config['db']['pass'],
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]
+    );
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(["error" => "DB接続エラーが発生しました"]);
@@ -42,11 +51,10 @@ if ($cachedData) {
 }
 
 // --- STEP 2: アクセストークン自動更新関数 ---
-function getValidAccessToken($pdo) {
-    // Strava Developer Portal (https://www.strava.com/settings/api) の情報を設定
-    $clientId = '22925';
-    $clientSecret = '0273c7c8f71ed7672edeb20907662565fcbed9cc';
-    $initialRefreshToken = 'd35983f6a6c91ee80b9f75921207b883c37047a6';
+function getValidAccessToken($pdo, $config) {
+    $clientId = $config['strava']['client_id'];
+    $clientSecret = $config['strava']['client_secret'];
+    $initialRefreshToken = $config['strava']['refresh_token'];
 
     // DBから既存のトークン情報を取得
     $stmt = $pdo->query("SELECT refresh_token, access_token, expires_at FROM strava_auth WHERE id = 1");
@@ -111,7 +119,7 @@ function getValidAccessToken($pdo) {
 }
 
 // --- STEP 3: 有効なアクセストークンを取得 ---
-$accessToken = getValidAccessToken($pdo);
+$accessToken = getValidAccessToken($pdo, $config);
 
 if (!$accessToken) {
     http_response_code(500);
