@@ -31,20 +31,49 @@ label {
   font-weight: bold;
 }
 
-input {
+/* 入力フォームとプルダウン共通の基本スタイル */
+input,
+select {
   width: 100%;
   height: 48px;
   padding: 0 12px;
   box-sizing: border-box;
 
   font-size: 18px;
+  font-family: inherit;
+  color: #222;
 
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #fff;
 }
 
+/* プルダウンメニュー（select）独自のリセット＆矢印デザイン */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  padding-right: 36px; /* 右側の矢印アイコン用の余白 */
+  cursor: pointer;
+
+  /* カスタムのドロップダウン矢印（SVG） */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%3C555' d='M6 8.825L1.175 4 2.238 2.938 6 6.7 9.763 2.938 10.825 4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+}
+
+/* フォーカス時のスタイリング */
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
 input,
+select,
 button {
   touch-action: manipulation;
 }
@@ -78,6 +107,12 @@ button:active {
   transform: scale(0.98);
 }
 
+button:disabled {
+  background-color: #90caf9;
+  cursor: not-allowed;
+  transform: none;
+}
+
 @media (max-width: 360px) {
   .container {
     width: calc(100% - 24px);
@@ -89,6 +124,7 @@ button:active {
   }
 
   input,
+  select,
   button {
     font-size: 16px;
   }
