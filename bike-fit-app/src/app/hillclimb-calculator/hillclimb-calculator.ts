@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -7,7 +7,7 @@ export const PRESET_COURSES = [
   { name: '富士ヒルクライム', segmentId: '664293' },
   { name: '乗鞍エコーライン', segmentId: '853124' },
   { name: '乗鞍スカイライン', segmentId: '7636376' },
-  { name: 'ツール・ド・美ヶ原', segmentId: '681464' },
+  { name: 'ツール・ド・美ヶ原', segmentId: '4388741' },
 ];
 
 interface VamTier {
@@ -19,6 +19,8 @@ interface VamTier {
 interface HistoryEntry {
   id: string;
   dateLabel: string;
+  segmentId: string;
+  courseName: string;
   riderWeightKg: number;
   bikeWeightKg: number;
   powerWatts: number;
@@ -37,7 +39,7 @@ interface HistoryEntry {
   templateUrl: './hillclimb-calculator.html',
   styleUrls: ['./hillclimb-calculator.css'],
 })
-export class HillclimbCalculator implements OnInit {
+export class HillclimbCalculator implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
 
@@ -80,8 +82,18 @@ export class HillclimbCalculator implements OnInit {
 
   history: HistoryEntry[] = [];
 
+  // 入力のたびに履歴を保存すると増えすぎるため、入力が落ち着いてから1回だけ保存する
+  private readonly HISTORY_SAVE_DEBOUNCE_MS = 1500;
+  private historySaveTimer: ReturnType<typeof setTimeout> | null = null;
+
   ngOnInit(): void {
     this.loadHistory();
+  }
+
+  ngOnDestroy(): void {
+    if (this.historySaveTimer) {
+      clearTimeout(this.historySaveTimer);
+    }
   }
 
   /**
@@ -156,6 +168,8 @@ export class HillclimbCalculator implements OnInit {
         hour: '2-digit',
         minute: '2-digit',
       }),
+      segmentId: this.selectedSegmentId,
+      courseName: this.selectedCourseName || '手入力',
       riderWeightKg: this.riderWeightKg,
       bikeWeightKg: this.bikeWeightKg,
       powerWatts: this.powerWatts,
@@ -171,6 +185,22 @@ export class HillclimbCalculator implements OnInit {
     this.persistHistory();
   }
 
+  /**
+   * 履歴保存を予約する。入力欄を連続で編集している間は保存を先送りし続け、
+   * 最後の変更から一定時間（1.5秒）操作がなかったときに1回だけ保存する。
+   * これにより、1文字入力するたびに履歴が増えてしまうのを防ぐ。
+   */
+  private scheduleHistorySave(): void {
+    if (this.historySaveTimer) {
+      clearTimeout(this.historySaveTimer);
+    }
+
+    this.historySaveTimer = setTimeout(() => {
+      this.historySaveTimer = null;
+      this.saveToHistory();
+    }, this.HISTORY_SAVE_DEBOUNCE_MS);
+  }
+
   removeHistoryEntry(id: string): void {
     this.history = this.history.filter((entry) => entry.id !== id);
     this.persistHistory();
@@ -182,6 +212,9 @@ export class HillclimbCalculator implements OnInit {
   }
 
   restoreFromHistory(entry: HistoryEntry): void {
+    this.selectedSegmentId = entry.segmentId;
+    this.selectedCourseName = entry.segmentId ? entry.courseName : '';
+
     this.riderWeightKg = entry.riderWeightKg;
     this.bikeWeightKg = entry.bikeWeightKg;
     this.powerWatts = entry.powerWatts;
@@ -239,7 +272,7 @@ export class HillclimbCalculator implements OnInit {
     this.vam = Math.round(vam);
     this.tier = this.VAM_TIERS.find((t) => vam >= t.minVam) ?? this.VAM_TIERS[this.VAM_TIERS.length - 1];
 
-    this.saveToHistory();
+    this.scheduleHistorySave();
   }
 
   private resetResult(): void {
