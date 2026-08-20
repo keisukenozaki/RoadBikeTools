@@ -27,6 +27,11 @@ jobs:
       - name: Build (production)
         run: npx ng build --configuration production --base-href /bikefit/
 
+      - name: Copy PHP API to build directory
+        run: |
+          mkdir -p ./dist/bike-fit-app/browser/api
+          cp -r ../bike-fit-API/api/* ./dist/bike-fit-app/browser/api/
+
       - name: Deploy to Xserver via FTPS (本番環境)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
