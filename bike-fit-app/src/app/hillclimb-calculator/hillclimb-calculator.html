@@ -1,0 +1,115 @@
+<div class="container">
+  <h1>ヒルクライム タイム予測</h1>
+
+  <p class="intro">
+    体重・自転車の重量・出力（パワー）と、坂の距離・標高差から、登坂タイムとVAM（時間あたりに登った標高、m/h）を計算します。空気抵抗は考慮していない簡易モデルなので、あくまで目安として使ってください。
+  </p>
+
+  <div class="form-group">
+    <label>体重（kg）</label>
+    <input type="number" inputmode="decimal" [(ngModel)]="riderWeightKg" placeholder="例：65" />
+  </div>
+
+  <div class="form-group">
+    <label>自転車＋装備の重量（kg）</label>
+    <input type="number" inputmode="decimal" [(ngModel)]="bikeWeightKg" placeholder="例：9" />
+  </div>
+
+  <div class="form-group">
+    <label>出力（W）</label>
+    <input type="number" inputmode="numeric" [(ngModel)]="powerWatts" placeholder="例：200" />
+    <p class="field-note">
+      その坂を登り切れるくらいの、持続できる出力の目安です。FTP（1時間持続できるパワー）が分かる場合は、その90〜100%程度を目安にしてください。
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label>距離（km）</label>
+    <input type="number" inputmode="decimal" [(ngModel)]="distanceKm" placeholder="例：10" />
+  </div>
+
+  <div class="form-group">
+    <label>標高差（m）</label>
+    <input type="number" inputmode="numeric" [(ngModel)]="elevationGainM" placeholder="例：500" />
+  </div>
+
+  <button class="calculate-button" (click)="calculate()">計算する</button>
+
+  <div class="error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="result" *ngIf="vam !== null && tier">
+    <h2>予測タイム</h2>
+    <p class="time-value">{{ timeLabel }}</p>
+    <p class="gradient-note">平均勾配 約{{ gradientPercent }}%</p>
+
+    <div class="vam-box">
+      <div class="vam-label">VAM（時間あたりの登坂速度）</div>
+      <div class="vam-value">{{ vam }} m/h</div>
+      <div class="vam-tier">{{ tier.label }}</div>
+      <div class="vam-tier-desc">{{ tier.description }}</div>
+    </div>
+
+    <p class="result-caution">
+      ※ 空気抵抗（向かい風・追い風）や、ペース配分・体調による変動は含まれていません。実際のタイムとは差が出ることがあります。
+    </p>
+  </div>
+
+  <!-- 計算結果の履歴 -->
+  <div class="history-section">
+    <div class="history-header">
+      <h3>計算履歴</h3>
+      <button
+        type="button"
+        class="clear-history-button"
+        *ngIf="history.length > 0"
+        (click)="clearHistory()"
+      >
+        全件削除
+      </button>
+    </div>
+
+    <p class="history-note" *ngIf="history.length > 0">
+      ※ この端末のブラウザ内にのみ保存されます（他の端末とは共有されません）／タップすると入力値を復元します
+    </p>
+
+    <p class="history-empty" *ngIf="history.length === 0">
+      まだ履歴がありません。計算すると、ここに表示されます。
+    </p>
+
+    <ul class="history-list" *ngIf="history.length > 0">
+      <li
+        class="history-item"
+        *ngFor="let entry of history"
+        role="button"
+        tabindex="0"
+        (click)="restoreFromHistory(entry)"
+        (keydown.enter)="restoreFromHistory(entry)"
+      >
+        <div class="history-item-main">
+          <div class="history-date">{{ entry.dateLabel }}</div>
+          <div class="history-method">{{ entry.tierLabel }}</div>
+        </div>
+
+        <div class="history-item-detail">
+          距離 {{ entry.distanceKm }}km ／ 標高差 {{ entry.elevationGainM }}m（約{{ entry.gradientPercent }}%）／
+          {{ entry.powerWatts }}W
+        </div>
+
+        <div class="history-item-result">
+          予測タイム：<strong>{{ entry.timeLabel }}</strong>（VAM {{ entry.vam }} m/h）
+        </div>
+
+        <button
+          type="button"
+          class="history-delete-button"
+          (click)="removeHistoryEntry(entry.id); $event.stopPropagation()"
+          aria-label="この履歴を削除"
+        >
+          ×
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>
