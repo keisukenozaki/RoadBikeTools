@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, NgZone } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -7,7 +7,7 @@ export const PRESET_COURSES = [
   { name: '富士ヒルクライム', segmentId: '664293' },
   { name: '乗鞍エコーライン', segmentId: '853124' },
   { name: '乗鞍スカイライン', segmentId: '7636376' },
-  { name: 'ツール・ド・美ヶ原', segmentId: '681464' }
+  { name: 'ツール・ド・美ヶ原', segmentId: '681464' },
 ];
 
 interface VamTier {
@@ -35,15 +35,15 @@ interface HistoryEntry {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './hillclimb-calculator.html',
-  styleUrl: './hillclimb-calculator.css',
+  styleUrls: ['./hillclimb-calculator.css'],
 })
 export class HillclimbCalculator implements OnInit {
   private http = inject(HttpClient);
-  private ngZone = inject(NgZone);
+  private cdr = inject(ChangeDetectorRef);
 
   presetCourses = PRESET_COURSES;
   selectedSegmentId = '';
-  selectedCourseName = ''; // 取得したコース名を保持
+  selectedCourseName = '';
   isLoadingCourse = false;
 
   riderWeightKg = 65;
@@ -85,12 +85,16 @@ export class HillclimbCalculator implements OnInit {
   }
 
   /**
-   * プルダウンでコースが選択された時に発火
+   * プルダウンでコースが選択された時の処理
    */
-  onCourseChange(): void {
+  onCourseChange(event?: Event): void {
     if (!this.selectedSegmentId) {
       this.selectedCourseName = '';
       return;
+    }
+
+    if (event?.target) {
+      (event.target as HTMLElement).blur();
     }
 
     this.isLoadingCourse = true;
@@ -101,21 +105,22 @@ export class HillclimbCalculator implements OnInit {
     this.http.get<{ name: string; distanceKm: number; elevationGainM: number }>(phpApiUrl)
       .subscribe({
         next: (res) => {
-          setTimeout(() => {
-            this.ngZone.run(() => {
-              this.distanceKm = res.distanceKm;
-              this.elevationGainM = res.elevationGainM;
-              this.selectedCourseName = res.name || '選択コース';
-              this.isLoadingCourse = false;
+          this.distanceKm = res.distanceKm;
+          this.elevationGainM = res.elevationGainM;
+          this.selectedCourseName = res.name || '選択コース';
+          this.isLoadingCourse = false;
 
-              // 値が確実にセットされた後に計算実行
-              this.calculate();
-            });
-          }, 0);
+          this.calculate();
+
+          // 手動で画面描画を同期
+          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         },
         error: () => {
           this.errorMessage = 'コースデータの取得に失敗しました。';
           this.isLoadingCourse = false;
+          this.cdr.markForCheck();
+          this.cdr.detectChanges();
         }
       });
   }
