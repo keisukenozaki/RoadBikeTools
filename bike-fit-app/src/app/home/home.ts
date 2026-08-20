@@ -43,6 +43,12 @@ export class Home {
       ready: true,
     },
     {
+      path: '/hillclimb',
+      name: 'ヒルクライム タイム予測',
+      description: '体重・出力・坂の距離と標高差から、登坂タイムとVAM（登坂速度）を計算します。',
+      ready: true,
+    },
+    {
       path: '/formulas',
       name: '計算式について',
       description: 'このアプリで使っている計算式が、誰によって・いつごろ生まれたものなのかをまとめました。',
