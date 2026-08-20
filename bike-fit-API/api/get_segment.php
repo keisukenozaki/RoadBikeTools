@@ -12,9 +12,9 @@ if (empty($segmentId) || !ctype_digit($segmentId)) {
 
 // --- DB接続設定 ---
 $dbHost = 'localhost';
-$dbName = 'YOUR_DB_NAME';
-$dbUser = 'YOUR_DB_USER';
-$dbPass = 'YOUR_DB_PASSWORD';
+$dbName = 'hifive_animalland';
+$dbUser = 'hifive_system';
+$dbPass = 'Katan20010303!';
 
 try {
     $pdo = new PDO("mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass, [
