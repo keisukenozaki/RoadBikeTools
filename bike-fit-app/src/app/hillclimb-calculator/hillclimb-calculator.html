@@ -1,0 +1,147 @@
+<div class="container">
+  <h1>ヒルクライムタイム予測</h1>
+  <p class="intro">
+    体重・愛車の重量・パワー（W）と、コースの距離・標高差を入力すると、想定される完走タイムとVAMを計算します。
+  </p>
+
+  <!-- コース選択 -->
+  <div class="form-group">
+    <label for="course-select">プリセットコース選択</label>
+    <select
+      id="course-select"
+      [(ngModel)]="selectedSegmentId"
+      (change)="onCourseChange($event)"
+    >
+      <option value="">-- 手入力・コースを選択 --</option>
+      <option *ngFor="let course of presetCourses" [value]="course.segmentId">
+        {{ course.name }}
+      </option>
+    </select>
+    <p class="field-note" *ngIf="isLoadingCourse">コース情報を読み込み中...</p>
+  </div>
+
+  <!-- 入力フォーム群 -->
+  <div class="form-group">
+    <label for="rider-weight">ライダー体重 (kg)</label>
+    <input
+      id="rider-weight"
+      type="number"
+      [(ngModel)]="riderWeightKg"
+      (input)="calculate()"
+      min="30"
+      max="150"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="bike-weight">自転車重量 (kg)</label>
+    <input
+      id="bike-weight"
+      type="number"
+      [(ngModel)]="bikeWeightKg"
+      (input)="calculate()"
+      min="3"
+      max="25"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="power-watts">平均パワー (W)</label>
+    <input
+      id="power-watts"
+      type="number"
+      [(ngModel)]="powerWatts"
+      (input)="calculate()"
+      min="50"
+      max="600"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="distance-km">距離 (km)</label>
+    <input
+      id="distance-km"
+      type="number"
+      step="0.1"
+      [(ngModel)]="distanceKm"
+      (input)="calculate()"
+      min="0.1"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="elevation-gain">獲得標高 (m)</label>
+    <input
+      id="elevation-gain"
+      type="number"
+      [(ngModel)]="elevationGainM"
+      (input)="calculate()"
+      min="0"
+    />
+  </div>
+
+  <button type="button" class="calc-btn" (click)="calculate()">
+    計算する
+  </button>
+
+  <!-- エラー表示 -->
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- 計算結果 -->
+  <div *ngIf="!errorMessage && timeLabel" class="result">
+    <h2>想定完走タイム</h2>
+    <p class="time-value">{{ timeLabel }}</p>
+    <p class="gradient-note">（平均斜度: {{ gradientPercent }}%）</p>
+
+    <div class="vam-box">
+      <div class="vam-label">予測 VAM（平均上昇スペック）</div>
+      <div class="vam-value">{{ vam }} m/h</div>
+      <div class="vam-tier" *ngIf="tier">{{ tier.label }}</div>
+      <div class="vam-tier-desc" *ngIf="tier">{{ tier.description }}</div>
+    </div>
+
+    <p class="result-caution">
+      ※風向きや空気抵抗、コースの斜度変化によって実際のタイムは前後します。
+    </p>
+  </div>
+
+  <!-- 履歴セクション -->
+  <div class="history-section" *ngIf="history.length > 0">
+    <div class="history-header">
+      <h3>計算履歴（最新10件）</h3>
+      <button type="button" class="clear-history-button" (click)="clearHistory()">
+        履歴を全削除
+      </button>
+    </div>
+    <p class="history-note">タップすると過去の入力条件を復元します</p>
+
+    <ul class="history-list">
+      <li
+        *ngFor="let item of history"
+        class="history-item"
+        (click)="restoreFromHistory(item)"
+      >
+        <div class="history-item-main">
+          <span class="history-date">{{ item.dateLabel }}</span>
+          <span class="history-method">{{ item.courseName }}</span>
+        </div>
+        <div class="history-item-detail">
+          {{ item.riderWeightKg }}kg + {{ item.bikeWeightKg }}kg / {{ item.powerWatts }}W
+          ({{ item.distanceKm }}km / {{ item.elevationGainM }}m / {{ item.gradientPercent }}%)
+        </div>
+        <div class="history-item-result">
+          {{ item.timeLabel }}／VAM: {{ item.vam }} m/h（{{ item.tierLabel }}）
+        </div>
+        <button
+          type="button"
+          class="history-delete-button"
+          (click)="$event.stopPropagation(); removeHistoryEntry(item.id)"
+        >
+          ×
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>

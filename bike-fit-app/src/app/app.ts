@@ -18,6 +18,7 @@ export class App {
     { path: '/kops', label: 'サドル前後位置（KOPS法）' },
     { path: '/tire-pressure', label: 'タイヤ空気圧計算' },
     { path: '/reach-drop', label: 'ハンドル・ステム（リーチ・ドロップ）' },
+    { path: '/hillclimb', label: 'ヒルクライム タイム予測' },
     { path: '/formulas', label: '計算式について' },
   ];
 
