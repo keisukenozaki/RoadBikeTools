@@ -1,6 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+
+export const PRESET_COURSES = [
+  { name: '富士ヒルクライム', segmentId: '664293' },
+  { name: '乗鞍エコーライン', segmentId: '853124' },
+  { name: '乗鞍スカイライン', segmentId: '7636376' },
+  { name: 'ツール・ド・美ヶ原', segmentId: '681464' }
+];
 
 interface VamTier {
   minVam: number;
@@ -8,7 +16,6 @@ interface VamTier {
   description: string;
 }
 
-/** 履歴1件分のデータ構造 */
 interface HistoryEntry {
   id: string;
   dateLabel: string;
@@ -31,6 +38,14 @@ interface HistoryEntry {
   styleUrl: './hillclimb-calculator.css',
 })
 export class HillclimbCalculator implements OnInit {
+  // HttpClient はこの1箇所のみで inject します
+  private http = inject(HttpClient);
+
+  presetCourses = PRESET_COURSES;
+  selectedSegmentId = '';
+  selectedCourseName = ''; // 取得したコース名を保持
+  isLoadingCourse = false;
+
   riderWeightKg = 65;
   bikeWeightKg = 9;
   powerWatts = 200;
@@ -46,13 +61,9 @@ export class HillclimbCalculator implements OnInit {
   tier: VamTier | null = null;
 
   // 物理定数
-  private readonly G = 9.81; // 重力加速度 (m/s^2)
-  private readonly CRR = 0.005; // 転がり抵抗係数（舗装路の目安）
-  private readonly DRIVETRAIN_EFFICIENCY = 0.97; // 駆動系の伝達効率
-
-  // ※ 空気抵抗は計算に含めていない。急勾配の登坂では速度が低く、
-  //   空気抵抗の影響が重力・転がり抵抗に比べて小さいための簡略化。
-  //   緩斜面や向かい風が強い状況では、実際のタイムより短めに出る傾向がある。
+  private readonly G = 9.81;
+  private readonly CRR = 0.005;
+  private readonly DRIVETRAIN_EFFICIENCY = 0.97;
 
   private readonly VAM_TIERS: VamTier[] = [
     { minVam: 1800, label: 'プロ トップクライマー級', description: 'グランツール山岳ステージの逃げ切りペース' },
@@ -64,8 +75,6 @@ export class HillclimbCalculator implements OnInit {
     { minVam: 0, label: 'のんびり・観光ペース', description: '景色を楽しみながらのペース' },
   ];
 
-  // ---- ここから履歴機能 ----
-
   private readonly HISTORY_STORAGE_KEY = 'bikefit-hillclimb-history';
   private readonly HISTORY_MAX_LENGTH = 20;
 
@@ -73,6 +82,39 @@ export class HillclimbCalculator implements OnInit {
 
   ngOnInit(): void {
     this.loadHistory();
+  }
+
+  /**
+   * プルダウンでコースが選択された時に発火
+   */
+  onCourseChange(): void {
+    if (!this.selectedSegmentId) {
+      this.selectedCourseName = '';
+      return;
+    }
+
+    this.isLoadingCourse = true;
+    this.errorMessage = '';
+
+    const phpApiUrl = `api/get_segment.php?id=${this.selectedSegmentId}`;
+
+    this.http.get<{ name: string; distanceKm: number; elevationGainM: number }>(phpApiUrl)
+      .subscribe({
+        next: (res) => {
+          // 取得データをプロパティへ反映（画面の入力欄にも自動反映される）
+          this.distanceKm = res.distanceKm;
+          this.elevationGainM = res.elevationGainM;
+          this.selectedCourseName = res.name || '選択コース';
+          this.isLoadingCourse = false;
+
+          // 距離・標高差が入ったのでその場でタイム予測を実行
+          this.calculate();
+        },
+        error: () => {
+          this.errorMessage = 'コースデータの取得に失敗しました。';
+          this.isLoadingCourse = false;
+        }
+      });
   }
 
   private loadHistory(): void {
@@ -88,7 +130,7 @@ export class HillclimbCalculator implements OnInit {
     try {
       localStorage.setItem(this.HISTORY_STORAGE_KEY, JSON.stringify(this.history));
     } catch {
-      // 容量オーバーなどは静かに無視する
+      // 無視
     }
   }
 
@@ -144,8 +186,6 @@ export class HillclimbCalculator implements OnInit {
     this.vam = entry.vam;
     this.tier = this.VAM_TIERS.find((t) => t.label === entry.tierLabel) ?? null;
   }
-
-  // ---- ここまで履歴機能 ----
 
   calculate(): void {
     this.errorMessage = '';

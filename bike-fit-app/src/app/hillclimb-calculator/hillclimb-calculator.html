@@ -2,8 +2,23 @@
   <h1>ヒルクライム タイム予測</h1>
 
   <p class="intro">
-    体重・自転車の重量・出力（パワー）と、坂の距離・標高差から、登坂タイムとVAM（時間あたりに登った標高、m/h）を計算します。空気抵抗は考慮していない簡易モデルなので、あくまで目安として使ってください。
+    体重・自転車の重量・出力（パワー）と、坂の距離・標高差から、登坂タイムとVAM（時間あたりに登った標高、m/h）を計算します。
   </p>
+
+  <!-- コース選択プルダウン -->
+  <div class="form-group">
+    <label for="course-select">定番コースから自動入力</label>
+    <select id="course-select" [(ngModel)]="selectedSegmentId" (change)="onCourseChange()">
+      <option value="">-- 手入力（カスタム） --</option>
+      <option *ngFor="let course of presetCourses" [value]="course.segmentId">
+        {{ course.name }}
+      </option>
+    </select>
+    <p class="field-note" *ngIf="isLoadingCourse">コースデータを取得中...</p>
+    <p class="field-note" *ngIf="selectedCourseName && !isLoadingCourse" style="color: #1976d2; font-weight: bold;">
+      選択中: {{ selectedCourseName }} ({{ distanceKm }}km / {{ elevationGainM }}m)
+    </p>
+  </div>
 
   <div class="form-group">
     <label>体重（kg）</label>
@@ -19,7 +34,7 @@
     <label>出力（W）</label>
     <input type="number" inputmode="numeric" [(ngModel)]="powerWatts" placeholder="例：200" />
     <p class="field-note">
-      その坂を登り切れるくらいの、持続できる出力の目安です。FTP（1時間持続できるパワー）が分かる場合は、その90〜100%程度を目安にしてください。
+      その坂を登り切れるくらいの、持続できる出力の目安です。
     </p>
   </div>
 
@@ -33,7 +48,9 @@
     <input type="number" inputmode="numeric" [(ngModel)]="elevationGainM" placeholder="例：500" />
   </div>
 
-  <button class="calculate-button" (click)="calculate()">計算する</button>
+  <button class="calculate-button" (click)="calculate()" [disabled]="isLoadingCourse">
+    {{ isLoadingCourse ? 'データ取得中...' : '計算する' }}
+  </button>
 
   <div class="error" *ngIf="errorMessage">
     {{ errorMessage }}
@@ -52,11 +69,11 @@
     </div>
 
     <p class="result-caution">
-      ※ 空気抵抗（向かい風・追い風）や、ペース配分・体調による変動は含まれていません。実際のタイムとは差が出ることがあります。
+      ※ 空気抵抗やペース配分による変動は含まれていません。実際のタイムとは差が出ることがあります。
     </p>
   </div>
 
-  <!-- 計算結果の履歴 -->
+  <!-- 計算履歴部分 -->
   <div class="history-section">
     <div class="history-header">
       <h3>計算履歴</h3>
@@ -71,7 +88,7 @@
     </div>
 
     <p class="history-note" *ngIf="history.length > 0">
-      ※ この端末のブラウザ内にのみ保存されます（他の端末とは共有されません）／タップすると入力値を復元します
+      ※ この端末のブラウザ内にのみ保存されます／タップすると入力値を復元します
     </p>
 
     <p class="history-empty" *ngIf="history.length === 0">
@@ -85,7 +102,6 @@
         role="button"
         tabindex="0"
         (click)="restoreFromHistory(entry)"
-        (keydown.enter)="restoreFromHistory(entry)"
       >
         <div class="history-item-main">
           <div class="history-date">{{ entry.dateLabel }}</div>
@@ -105,7 +121,6 @@
           type="button"
           class="history-delete-button"
           (click)="removeHistoryEntry(entry.id); $event.stopPropagation()"
-          aria-label="この履歴を削除"
         >
           ×
         </button>
