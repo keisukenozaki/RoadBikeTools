@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -38,8 +38,8 @@ interface HistoryEntry {
   styleUrl: './hillclimb-calculator.css',
 })
 export class HillclimbCalculator implements OnInit {
-  // HttpClient はこの1箇所のみで inject します
   private http = inject(HttpClient);
+  private cdr = inject(ChangeDetectorRef);
 
   presetCourses = PRESET_COURSES;
   selectedSegmentId = '';
@@ -109,10 +109,12 @@ export class HillclimbCalculator implements OnInit {
 
           // 距離・標高差が入ったのでその場でタイム予測を実行
           this.calculate();
+          this.cdr.detectChanges();
         },
         error: () => {
           this.errorMessage = 'コースデータの取得に失敗しました。';
           this.isLoadingCourse = false;
+          this.cdr.detectChanges();
         }
       });
   }
