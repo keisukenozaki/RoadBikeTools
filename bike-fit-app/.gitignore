@@ -2,6 +2,7 @@
 
 # 機密設定ファイル（Gitで管理しない）
 api/config.php
+config.php
 
 # Compiled output
 /dist
