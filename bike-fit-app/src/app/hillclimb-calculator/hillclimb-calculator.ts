@@ -78,7 +78,7 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
   ];
 
   private readonly HISTORY_STORAGE_KEY = 'bikefit-hillclimb-history';
-  private readonly HISTORY_MAX_LENGTH = 20;
+  private readonly HISTORY_MAX_LENGTH = 10;
 
   history: HistoryEntry[] = [];
 
@@ -122,7 +122,7 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
           this.selectedCourseName = res.name || '選択コース';
           this.isLoadingCourse = false;
 
-          this.calculate();
+          // this.calculate();自動計算削除
 
           // 手動で画面描画を同期
           this.cdr.markForCheck();
@@ -272,7 +272,8 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
     this.vam = Math.round(vam);
     this.tier = this.VAM_TIERS.find((t) => vam >= t.minVam) ?? this.VAM_TIERS[this.VAM_TIERS.length - 1];
 
-    this.scheduleHistorySave();
+    // this.scheduleHistorySave();
+    this.saveToHistory();
   }
 
   private resetResult(): void {

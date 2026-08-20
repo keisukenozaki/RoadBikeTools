@@ -80,6 +80,10 @@
     />
   </div>
 
+  <button type="button" class="calc-btn" (click)="calculate()">
+    計算する
+  </button>
+
   <!-- エラー表示 -->
   <div *ngIf="errorMessage" class="error">
     {{ errorMessage }}
@@ -106,7 +110,7 @@
   <!-- 履歴セクション -->
   <div class="history-section" *ngIf="history.length > 0">
     <div class="history-header">
-      <h3>計算履歴（最新20件）</h3>
+      <h3>計算履歴（最新10件）</h3>
       <button type="button" class="clear-history-button" (click)="clearHistory()">
         履歴を全削除
       </button>
