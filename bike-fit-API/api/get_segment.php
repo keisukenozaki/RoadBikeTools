@@ -91,7 +91,6 @@ try {
 $courseName =
     $_GET['name'] ?? '';
 
-
 // --------------------------------------------------
 // DBキャッシュ確認
 // --------------------------------------------------
@@ -120,22 +119,28 @@ $cachedData = $stmt->fetch();
 
 if ($cachedData) {
     echo json_encode([
+        // ブラウザから渡されたコース名を優先
         'name' =>
             $courseName !== ''
                 ? $courseName
                 : $cachedData['name'],
+        // Strava側の名前
         'stravaName' =>
             $cachedData['strava_name'] ?? '',
+        // 距離
         'distanceKm' =>
             (float)$cachedData['distanceKm'],
+        // 標高差
         'elevationGainM' =>
             (int)$cachedData['elevationGainM'],
+        // 平均勾配
         'averageGrade' =>
-            $cachedData['average_grade'] !== null
+            $cachedData['averageGrade'] !== null
                 ? (float)$cachedData['averageGrade']
                 : null,
+        // 最大勾配
         'maximumGrade' =>
-            $cachedData['maximum_grade'] !== null
+            $cachedData['maximumGrade'] !== null
                 ? (float)$cachedData['maximumGrade']
                 : null,
     ], JSON_UNESCAPED_UNICODE);
