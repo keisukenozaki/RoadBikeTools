@@ -146,10 +146,16 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
     this.isLoadingCourse = true;
     this.errorMessage = '';
 
+    console.log('selectedCourse:', this.selectedCourse);
+    console.log('segmentId:', this.selectedCourse?.segmentId);
+    console.log('name:', this.selectedCourse?.name);
+
     // segmentId と name の両方をAPIに渡す
     const phpApiUrl =
       `api/get_segment.php?id=${encodeURIComponent(this.selectedCourse.segmentId)}` +
       `&name=${encodeURIComponent(this.selectedCourse.name)}`;
+
+    console.log('API URL:', phpApiUrl);
 
     this.http
       .get<{
