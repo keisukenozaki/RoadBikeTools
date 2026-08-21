@@ -122,8 +122,6 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
           this.selectedCourseName = res.name || '選択コース';
           this.isLoadingCourse = false;
 
-          // this.calculate();自動計算削除
-
           // 手動で画面描画を同期
           this.cdr.markForCheck();
           this.cdr.detectChanges();
