@@ -15,6 +15,9 @@ export const PRESET_COURSES = [
   { name: '乗鞍エコーライン', segmentId: '853124' },
   { name: '乗鞍スカイライン', segmentId: '7636376' },
   { name: 'ツール・ド・美ヶ原', segmentId: '4388741' },
+  { name: '渋峠（長野側）', segmentId: '12868114' },
+  { name: '雨沢峠', segmentId: '1620351' },
+  { name: '暗峠(大阪側)', segmentId: '2525963' },
 ];
 
 interface PresetCourse {
