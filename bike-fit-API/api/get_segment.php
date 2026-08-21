@@ -114,44 +114,33 @@ $stmt->execute([
 
 $cachedData = $stmt->fetch();
 
-
 // --------------------------------------------------
 // キャッシュがあれば返却
 // --------------------------------------------------
 
 if ($cachedData) {
-
     echo json_encode([
-
         'name' =>
             $courseName !== ''
                 ? $courseName
                 : $cachedData['name'],
-
         'stravaName' =>
-            $cachedData['strava_name'],
-
+            $cachedData['strava_name'] ?? '',
         'distanceKm' =>
             (float)$cachedData['distanceKm'],
-
         'elevationGainM' =>
             (int)$cachedData['elevationGainM'],
-
         'averageGrade' =>
             $cachedData['average_grade'] !== null
-                ? (float)$cachedData['average_grade']
+                ? (float)$cachedData['averageGrade']
                 : null,
-
         'maximumGrade' =>
             $cachedData['maximum_grade'] !== null
-                ? (float)$cachedData['maximum_grade']
+                ? (float)$cachedData['maximumGrade']
                 : null,
-
     ], JSON_UNESCAPED_UNICODE);
-
     exit;
 }
-
 
 // --------------------------------------------------
 // Stravaアクセストークン取得
