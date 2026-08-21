@@ -19,6 +19,13 @@
     </select>
     <p class="field-note" *ngIf="isLoadingCourse">STRAVAのコース情報を読み込み中...</p>
     <p class="field-note" *ngIf="!isLoadingCourse && stravaName">STRAVA名：{{ stravaName }}</p>
+    <p class="field-note" *ngIf="!isLoadingCourse && averageGrade !== null">
+      平均勾配：{{ averageGrade }}%
+    </p>
+
+    <p class="field-note" *ngIf="!isLoadingCourse && maximumGrade !== null">
+      最大勾配：{{ maximumGrade }}%
+    </p>
   </div>
 
   <!-- 入力フォーム群 -->
@@ -109,6 +116,55 @@
       ※風向きや空気抵抗、コースの斜度変化によって実際のタイムは前後します。
     </p>
   </div>
+
+<div class="time-reduction-box" *ngIf="timeSeconds > 0">
+  <h3>タイム短縮シミュレーション</h3>
+  <div class="current-time">
+    <span>現在の予測タイム</span>
+    <strong>{{ timeLabel }}</strong>
+  </div>
+  <div class="reduction-input">
+    <label for="target-improve">
+      あと
+    </label>
+    <input
+      id="target-improve"
+      type="number"
+      [(ngModel)]="targetImproveMinutes"
+      (ngModelChange)="calculateTimeReduction()"
+      min="1"
+      max="120"
+      step="1"
+    >
+    <span>分縮める</span>
+  </div>
+  <div class="reduction-result" *ngIf="requiredPowerWatts !== null">
+    <div class="target-time">
+      <span>目標タイム</span>
+      <strong>
+        {{ targetTimeLabel }}
+      </strong>
+    </div>
+    <div class="required-power">
+      <span>必要パワー</span>
+      <strong>
+        {{ requiredPowerWatts }} W
+      </strong>
+    </div>
+    <div
+      class="additional-power"
+      *ngIf="additionalPowerWatts !== null"
+    >
+      <span>現在より</span>
+      <strong *ngIf="additionalPowerWatts >= 0">
+        +{{ additionalPowerWatts }} W
+      </strong>
+      <strong *ngIf="additionalPowerWatts < 0">
+        {{ additionalPowerWatts }} W
+      </strong>
+    </div>
+  </div>
+</div>
 
   <!-- 履歴セクション -->
   <div class="history-section" *ngIf="history.length > 0">
