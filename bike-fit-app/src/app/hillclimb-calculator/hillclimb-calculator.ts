@@ -55,6 +55,7 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
 
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
+  private readonly INPUT_STORAGE_KEY = 'bikefit-hillclimb-inputs';
 
   presetCourses = PRESET_COURSES;
 
@@ -172,6 +173,7 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadHistory();
+    this.loadSavedInputs();
   }
 
   ngOnDestroy(): void {
@@ -368,6 +370,9 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
       this.VAM_TIERS[
       this.VAM_TIERS.length - 1
       ];
+
+    // 「計算する」を押したときだけ入力値を保存
+    this.saveInputs();
 
     // タイム短縮シミュレーション
     this.calculateTimeReduction();
@@ -691,23 +696,14 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
   // ==========================================
 
   private resetResult(): void {
-
     this.gradientPercent = null;
-
     this.timeLabel = '';
-
     this.timeSeconds = 0;
-
     this.vam = null;
-
     this.tier = null;
-
     this.targetTimeSeconds = null;
-
     this.requiredPowerWatts = null;
-
     this.additionalPowerWatts = null;
-
     this.targetTimeLabel = '';
   }
 
@@ -741,5 +737,47 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
     }
 
     return `${minutes}分${seconds}秒`;
+  }
+
+  private loadSavedInputs(): void {
+    try {
+      const raw = localStorage.getItem(this.INPUT_STORAGE_KEY);
+
+      if (!raw) {
+        return;
+      }
+
+      const saved = JSON.parse(raw);
+
+      if (typeof saved.riderWeightKg === 'number') {
+        this.riderWeightKg = saved.riderWeightKg;
+      }
+
+      if (typeof saved.bikeWeightKg === 'number') {
+        this.bikeWeightKg = saved.bikeWeightKg;
+      }
+
+      if (typeof saved.powerWatts === 'number') {
+        this.powerWatts = saved.powerWatts;
+      }
+
+    } catch {
+      // 保存データが壊れていても初期値のまま使用
+    }
+  }
+
+  private saveInputs(): void {
+    try {
+      localStorage.setItem(
+        this.INPUT_STORAGE_KEY,
+        JSON.stringify({
+          riderWeightKg: this.riderWeightKg,
+          bikeWeightKg: this.bikeWeightKg,
+          powerWatts: this.powerWatts,
+        })
+      );
+    } catch {
+      // 保存できなくても計算には影響させない
+    }
   }
 }
