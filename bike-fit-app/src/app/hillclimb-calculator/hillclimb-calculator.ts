@@ -76,6 +76,10 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
   distanceKm = 10;
   elevationGainM = 500;
 
+  powerIncreasePercent: number | null = null;
+  reductionComment = '';
+  reductionLevel = '';
+
   errorMessage = '';
 
   gradientPercent: number | null = null;
@@ -362,7 +366,7 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
         (t) => vam >= t.minVam
       ) ??
       this.VAM_TIERS[
-        this.VAM_TIERS.length - 1
+      this.VAM_TIERS.length - 1
       ];
 
     // タイム短縮シミュレーション
@@ -404,33 +408,23 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
       this.additionalPowerWatts = null;
       this.targetTimeLabel = '';
 
+      this.powerIncreasePercent = null;
+      this.reductionComment = '';
+      this.reductionLevel = '';
+
       return;
     }
-
-    this.targetTimeSeconds =
-      targetTime;
-
-    this.targetTimeLabel =
-      this.formatTime(targetTime);
+    this.targetTimeSeconds = targetTime;
+    this.targetTimeLabel = this.formatTime(targetTime);
 
     // ==========================================
     // 必要パワーを逆算
     // ==========================================
 
-    const totalMassKg =
-      this.riderWeightKg +
-      this.bikeWeightKg;
-
-    const distanceM =
-      this.distanceKm * 1000;
-
-    const theta =
-      Math.atan(
-        this.elevationGainM / distanceM
-      );
-
-    const requiredSpeedMs =
-      distanceM / targetTime;
+    const totalMassKg = this.riderWeightKg + this.bikeWeightKg;
+    const distanceM = this.distanceKm * 1000;
+    const theta = Math.atan(this.elevationGainM / distanceM);
+    const requiredSpeedMs = distanceM / targetTime;
 
     const requiredPower =
       (
@@ -444,14 +438,75 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
       ) /
       this.DRIVETRAIN_EFFICIENCY;
 
-    this.requiredPowerWatts =
-      Math.ceil(requiredPower);
+    this.requiredPowerWatts = Math.ceil(requiredPower);
 
     this.additionalPowerWatts =
       Math.ceil(
         requiredPower -
         this.powerWatts
       );
+
+    // ==========================================
+    // パワー増加率
+    // ==========================================
+
+    this.powerIncreasePercent =
+      Math.round(
+        (
+          this.additionalPowerWatts /
+          this.powerWatts
+        ) * 1000
+      ) / 10;
+
+    // ==========================================
+    // 頑張り度コメント
+    // ==========================================
+
+    this.setReductionComment();
+  }
+
+  private setReductionComment(): void {
+    if (
+      this.powerIncreasePercent === null ||
+      this.additionalPowerWatts === null
+    ) {
+      this.reductionLevel = '';
+      this.reductionComment = '';
+      return;
+    }
+
+    const increase = this.powerIncreasePercent;
+
+    if (increase <= 2) {
+      this.reductionLevel = 'ちょっと頑張る';
+      this.reductionComment =
+        'あと少しのパワーアップで届きそうです。まずはこの目標から！';
+
+    } else if (increase <= 5) {
+      this.reductionLevel = 'もう一踏ん張り';
+      this.reductionComment =
+        '十分現実的な目標です。少しずつパワーアップを狙いましょう。';
+
+    } else if (increase <= 10) {
+      this.reductionLevel = 'しっかり頑張る';
+      this.reductionComment =
+        'それなりのパワーアップが必要です。トレーニングの成果が試されそうです。';
+
+    } else if (increase <= 15) {
+      this.reductionLevel = 'かなり頑張る';
+      this.reductionComment =
+        'なかなかの壁です。継続的なトレーニングでじっくり狙いたい目標です。';
+
+    } else if (increase <= 20) {
+      this.reductionLevel = '本気で頑張る';
+      this.reductionComment =
+        'かなり大きなパワーアップが必要です。短期間ではなく、じっくり取り組みたい目標です。';
+
+    } else {
+      this.reductionLevel = 'かなり高い壁';
+      this.reductionComment =
+        '大幅なパワーアップが必要です。まずは5分短縮など、段階的な目標から狙うのもおすすめです。';
+    }
   }
 
   // ==========================================
@@ -459,9 +514,7 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
   // ==========================================
 
   private loadHistory(): void {
-
     try {
-
       const raw =
         localStorage.getItem(
           this.HISTORY_STORAGE_KEY
