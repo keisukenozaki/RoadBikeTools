@@ -67,6 +67,8 @@ $stmt = $pdo->prepare("
     SELECT
         name,
         strava_name,
+        average_grade AS averageGrade,
+        maximum_grade AS maximumGrade,
         distance_km AS distanceKm,
         elevation_gain_m AS elevationGainM
     FROM segments
@@ -86,6 +88,8 @@ if ($cachedData) {
     echo json_encode([
         'name' => $courseName,
         'stravaName' => $cachedData['strava_name'],
+        'averageGrade' => $cachedData['averageGrade'],
+        'maximumGrade' => $cachedData['maximumGrade'],
         'distanceKm' => (float)$cachedData['distanceKm'],
         'elevationGainM' => (int)$cachedData['elevationGainM']
     ]);
@@ -250,13 +254,14 @@ $data = json_decode($response, true);
 
 // Stravaから取得した名前
 $stravaName = $data['name'] ?? '';
-
+// 勾配
+$averageGrade = $data['average_grade'] ?? null;
+$maximumGrade = $data['maximum_grade'] ?? null;
 // 距離
 $distanceKm = round(
     ($data['distance'] ?? 0) / 1000,
     2
 );
-
 // 標高差
 $elevationGainM = round(
     $data['total_elevation_gain'] ?? 0
@@ -272,6 +277,8 @@ try {
             segment_id,
             name,
             strava_name,
+            average_grade,
+            maximum_grade,
             distance_km,
             elevation_gain_m
         )
@@ -279,6 +286,8 @@ try {
             :id,
             :name,
             :strava_name,
+            :average_grade,
+            :maximum_grade,
             :dist,
             :elev
         )
@@ -286,13 +295,10 @@ try {
 
     $insertStmt->execute([
         ':id' => $segmentId,
-
-        // Angularから渡されたコース名
         ':name' => $courseName,
-
-        // Strava APIから取得したコース名
         ':strava_name' => $stravaName,
-
+        ':average_grade' => $averageGrade,
+        ':maximum_grade' => $maximumGrade,
         ':dist' => $distanceKm,
         ':elev' => $elevationGainM,
     ]);
@@ -308,12 +314,10 @@ try {
 // STEP 6: Angularへ返却
 // --------------------------------------------------
 echo json_encode([
-    // 画面表示用はAngularから渡されたコース名
     'name' => $courseName,
-
-    // 必要ならStrava名も返す
     'stravaName' => $stravaName,
-
+    'averageGrade' => $averageGrade,
+    'maximumGrade' => $maximumGrade,
     'distanceKm' => $distanceKm,
     'elevationGainM' => $elevationGainM
 ]);
