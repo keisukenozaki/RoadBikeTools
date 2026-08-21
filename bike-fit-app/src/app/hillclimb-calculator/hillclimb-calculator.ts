@@ -146,16 +146,10 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
     this.isLoadingCourse = true;
     this.errorMessage = '';
 
-    console.log('selectedCourse:', this.selectedCourse);
-    console.log('segmentId:', this.selectedCourse?.segmentId);
-    console.log('name:', this.selectedCourse?.name);
-
     // segmentId と name の両方をAPIに渡す
     const phpApiUrl =
       `api/get_segment.php?id=${encodeURIComponent(this.selectedCourse.segmentId)}` +
       `&name=${encodeURIComponent(this.selectedCourse.name)}`;
-
-    console.log('API URL:', phpApiUrl);
 
     this.http
       .get<{
@@ -169,26 +163,13 @@ export class HillclimbCalculator implements OnInit, OnDestroy {
           this.distanceKm = res.distanceKm;
           this.elevationGainM = res.elevationGainM;
           this.stravaName = res.stravaName || '';
-
-          // APIからnameが返ってきたらそれを使用
-          // 返ってこなければ選択したコース名を使用
-          if (res.name) {
-            this.selectedCourse = {
-              ...this.selectedCourse!,
-              name: res.name,
-            };
-          }
-
           this.isLoadingCourse = false;
-
           this.cdr.markForCheck();
           this.cdr.detectChanges();
         },
-
         error: () => {
           this.errorMessage = 'コースデータの取得に失敗しました。';
           this.isLoadingCourse = false;
-
           this.cdr.markForCheck();
           this.cdr.detectChanges();
         },
