@@ -7,77 +7,49 @@
   <!-- コース選択 -->
   <div class="form-group">
     <label for="course-select">プリセットコース選択</label>
-    <select
-      id="course-select"
-      [(ngModel)]="selectedSegmentId"
-      (change)="onCourseChange($event)"
-    >
-      <option value="">-- 手入力・コースを選択 --</option>
-      <option *ngFor="let course of presetCourses" [value]="course.segmentId">
+    <select id="course-select" [(ngModel)]="selectedCourse" (change)="onCourseChange($event)">
+      <option [ngValue]="null">-- コースを選択 --</option>
+      <option *ngFor="let course of presetCourses" [ngValue]="course">
         {{ course.name }}
       </option>
     </select>
-    <p class="field-note" *ngIf="isLoadingCourse">コース情報を読み込み中...</p>
+    <p class="field-note" *ngIf="isLoadingCourse">STRAVAのコース情報を読み込み中...</p>
+    <p class="field-note" *ngIf="!isLoadingCourse && stravaName">STRAVA名：{{ stravaName }}</p>
+    <p class="field-note" *ngIf="!isLoadingCourse && averageGrade !== null">
+      平均勾配：{{ averageGrade }}%
+    </p>
+
+    <p class="field-note" *ngIf="!isLoadingCourse && maximumGrade !== null">
+      最大勾配：{{ maximumGrade }}%
+    </p>
   </div>
 
   <!-- 入力フォーム群 -->
-  <div class="form-group">
-    <label for="rider-weight">ライダー体重 (kg)</label>
-    <input
-      id="rider-weight"
-      type="number"
-      [(ngModel)]="riderWeightKg"
-      (input)="calculate()"
-      min="30"
-      max="150"
-    />
-  </div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label for="distance-km">距離 (km)</label>
+      <input id="distance-km" type="number" step="0.1" [(ngModel)]="distanceKm" min="0.1" />
+    </div>
 
-  <div class="form-group">
-    <label for="bike-weight">自転車重量 (kg)</label>
-    <input
-      id="bike-weight"
-      type="number"
-      [(ngModel)]="bikeWeightKg"
-      (input)="calculate()"
-      min="3"
-      max="25"
-    />
-  </div>
+    <div class="form-group">
+      <label for="elevation-gain">獲得標高 (m)</label>
+      <input id="elevation-gain" type="number" [(ngModel)]="elevationGainM" min="0" />
+    </div>
 
-  <div class="form-group">
-    <label for="power-watts">平均パワー (W)</label>
-    <input
-      id="power-watts"
-      type="number"
-      [(ngModel)]="powerWatts"
-      (input)="calculate()"
-      min="50"
-      max="600"
-    />
-  </div>
+    <div class="form-group">
+      <label for="rider-weight">ライダー体重 (kg)</label>
+      <input id="rider-weight" type="number" [(ngModel)]="riderWeightKg" min="30" max="150" />
+    </div>
 
-  <div class="form-group">
-    <label for="distance-km">距離 (km)</label>
-    <input
-      id="distance-km"
-      type="number"
-      step="0.1"
-      [(ngModel)]="distanceKm"
-      (input)="calculate()"
-      min="0.1"
-    />
-  </div>
+    <div class="form-group">
+      <label for="bike-weight">自転車重量 (kg)</label>
+      <input id="bike-weight" type="number" [(ngModel)]="bikeWeightKg" min="3" max="25" />
+    </div>
 
-  <div class="form-group">
-    <label for="elevation-gain">獲得標高 (m)</label>
-    <input
-      id="elevation-gain"
-      type="number"
-      [(ngModel)]="elevationGainM"
-      (input)="calculate()"
-      min="0"
-    />
+    <div class="form-group form-group-wide">
+      <label for="power-watts">平均パワー (W)</label>
+      <input id="power-watts" type="number" [(ngModel)]="powerWatts" min="50" max="600" />
+    </div>
   </div>
 
   <button type="button" class="calc-btn" (click)="calculate()">
@@ -107,6 +79,60 @@
     </p>
   </div>
 
+  <div class="time-reduction-box" *ngIf="timeSeconds > 0">
+    <h1>タイム短縮シミュレーション</h1>
+    <div class="current-time">
+      <span>現在の予測タイム</span>
+      <strong>{{ timeLabel }}</strong>
+      <span>を</span>
+    </div>
+    <div class="reduction-input">
+      <span>あと</span>
+
+      <input id="target-improve" type="number" [(ngModel)]="targetImproveMinutes"
+        (ngModelChange)="calculateTimeReduction()" min="1" max="120" step="1" />
+      <span>分縮めるなら</span>
+    </div>
+    <div class="reduction-result" *ngIf="requiredPowerWatts !== null">
+      <div class="target-time">
+        <span>目標タイム</span>
+        <strong>
+          {{ targetTimeLabel }}
+        </strong>
+      </div>
+      <div class="required-power">
+        <span>必要パワー</span>
+        <strong>
+          {{ requiredPowerWatts }} W
+        </strong>
+      </div>
+      <div class="additional-power" *ngIf="additionalPowerWatts !== null">
+        <span>現在より</span>
+        <strong *ngIf="additionalPowerWatts >= 0">
+          +{{ additionalPowerWatts }} W
+        </strong>
+        <strong *ngIf="additionalPowerWatts < 0">
+          {{ additionalPowerWatts }} W
+        </strong>
+      </div>
+
+      <!-- パワー増加率 -->
+      <div class="power-increase" *ngIf="powerIncreasePercent !== null">
+        <span>パワーアップ率</span>
+        <strong>+{{ powerIncreasePercent }}%</strong>
+      </div>
+      <!-- 頑張り度コメント -->
+      <div class="reduction-comment" *ngIf="reductionComment">
+        <div class="reduction-level">
+          {{ reductionLevel }}
+        </div>
+        <p>
+          {{ reductionComment }}
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- 履歴セクション -->
   <div class="history-section" *ngIf="history.length > 0">
     <div class="history-header">
@@ -118,11 +144,7 @@
     <p class="history-note">タップすると過去の入力条件を復元します</p>
 
     <ul class="history-list">
-      <li
-        *ngFor="let item of history"
-        class="history-item"
-        (click)="restoreFromHistory(item)"
-      >
+      <li *ngFor="let item of history" class="history-item" (click)="restoreFromHistory(item)">
         <div class="history-item-main">
           <span class="history-date">{{ item.dateLabel }}</span>
           <span class="history-method">{{ item.courseName }}</span>
@@ -132,13 +154,10 @@
           ({{ item.distanceKm }}km / {{ item.elevationGainM }}m / {{ item.gradientPercent }}%)
         </div>
         <div class="history-item-result">
-          {{ item.timeLabel }}／VAM: {{ item.vam }} m/h（{{ item.tierLabel }}）
+          {{ item.timeLabel }}/VAM: {{ item.vam }} m/h（{{ item.tierLabel }}）
         </div>
-        <button
-          type="button"
-          class="history-delete-button"
-          (click)="$event.stopPropagation(); removeHistoryEntry(item.id)"
-        >
+        <button type="button" class="history-delete-button"
+          (click)="$event.stopPropagation(); removeHistoryEntry(item.id)">
           ×
         </button>
       </li>

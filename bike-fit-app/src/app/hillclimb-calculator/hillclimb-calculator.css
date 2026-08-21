@@ -24,6 +24,20 @@ h1 {
   margin-bottom: 20px;
 }
 
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+}
+
+.form-grid .form-group {
+  margin-bottom: 20px;
+}
+
+.form-grid .form-group-wide {
+  grid-column: 1 / -1;
+}
+
 label {
   display: block;
   margin-bottom: 8px;
@@ -219,7 +233,7 @@ button:disabled {
 .history-section {
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #858585;
   text-align: left;
 }
 
@@ -366,4 +380,27 @@ button:disabled {
 .history-delete-button:active {
   background-color: #f0f0f0;
   transform: none;
+}
+
+.reduction-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0;
+  white-space: nowrap;
+}
+
+.reduction-input input {
+  width: 70px;
+  padding: 8px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.time-reduction-box {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #858585;
+  text-align: left;
 }
