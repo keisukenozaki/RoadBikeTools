@@ -9,15 +9,16 @@
     <label for="course-select">プリセットコース選択</label>
     <select
       id="course-select"
-      [(ngModel)]="selectedSegmentId"
+      [(ngModel)]="selectedCourse"
       (change)="onCourseChange($event)"
     >
-      <option value="">-- 手入力・コースを選択 --</option>
-      <option *ngFor="let course of presetCourses" [value]="course.segmentId">
+      <option [ngValue]="null">-- コースを選択 --</option>
+      <option *ngFor="let course of presetCourses" [ngValue]="course">
         {{ course.name }}
       </option>
     </select>
-    <p class="field-note" *ngIf="isLoadingCourse">コース情報を読み込み中...</p>
+    <p class="field-note" *ngIf="isLoadingCourse">STRAVAのコース情報を読み込み中...</p>
+    <p class="field-note" *ngIf="!isLoadingCourse && stravaName">STRAVA名：{{ stravaName }}</p>
   </div>
 
   <!-- 入力フォーム群 -->
