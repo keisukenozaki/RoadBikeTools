@@ -50,6 +50,26 @@
   margin: 0;
 }
 
+/* カテゴリ見出し */
+.tool-category {
+  margin-top: 24px;
+}
+
+.tool-category:first-of-type {
+  margin-top: 0;
+}
+
+.tool-category-label {
+  margin: 0 0 12px;
+  padding-bottom: 6px;
+
+  font-size: 14px;
+  font-weight: bold;
+  color: #1976d2;
+
+  border-bottom: 2px solid #eef6ff;
+}
+
 /* ツールカード */
 .tool-list {
   display: flex;

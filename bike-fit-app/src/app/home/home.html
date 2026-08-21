@@ -8,25 +8,29 @@
       class="hero-image"
     />
 
-    <p class="brand-tagline">ロードバイクのフィッティング、いろいろ計算できます</p>
+    <p class="brand-tagline">サドル・タイヤ・ハンドル・ヒルクライム予測！ロードバイクを数字で調整する</p>
 
     <p class="intro">
-      サドルの高さ・前後位置、タイヤの空気圧まで、自転車のセッティングに関する計算をまとめました。数値は股下長や体重などから算出する目安なので、実際に乗りながら微調整して使ってください。
+      サドルの高さ・前後位置、ハンドル・ステムのリーチとドロップ、タイヤの空気圧、そしてヒルクライムのタイム予測などの計算ツールです！数値はどれも「目安」なので、実際に乗りながら微調整して使ってください。
     </p>
   </div>
 
-  <div class="tool-list">
-    <a
-      class="tool-card"
-      *ngFor="let tool of tools"
-      [routerLink]="tool.path"
-    >
-      <div class="tool-card-header">
-        <span class="tool-name">{{ tool.name }}</span>
-        <span class="tool-badge" *ngIf="!tool.ready">準備中</span>
-      </div>
-      <p class="tool-description">{{ tool.description }}</p>
-    </a>
+  <div class="tool-category" *ngFor="let category of toolCategories">
+    <h2 class="tool-category-label">{{ category.label }}</h2>
+
+    <div class="tool-list">
+      <a
+        class="tool-card"
+        *ngFor="let tool of category.tools"
+        [routerLink]="tool.path"
+      >
+        <div class="tool-card-header">
+          <span class="tool-name">{{ tool.name }}</span>
+          <span class="tool-badge" *ngIf="!tool.ready">準備中</span>
+        </div>
+        <p class="tool-description">{{ tool.description }}</p>
+      </a>
+    </div>
   </div>
 
   <div class="note-box">
