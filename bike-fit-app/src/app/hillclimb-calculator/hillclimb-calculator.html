@@ -21,63 +21,65 @@
   </div>
 
   <!-- 入力フォーム群 -->
-  <div class="form-group">
-    <label for="rider-weight">ライダー体重 (kg)</label>
-    <input
-      id="rider-weight"
-      type="number"
-      [(ngModel)]="riderWeightKg"
-      (input)="calculate()"
-      min="30"
-      max="150"
-    />
-  </div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label for="distance-km">距離 (km)</label>
+      <input
+        id="distance-km"
+        type="number"
+        step="0.1"
+        [(ngModel)]="distanceKm"
+        (input)="calculate()"
+        min="0.1"
+      />
+    </div>
 
-  <div class="form-group">
-    <label for="bike-weight">自転車重量 (kg)</label>
-    <input
-      id="bike-weight"
-      type="number"
-      [(ngModel)]="bikeWeightKg"
-      (input)="calculate()"
-      min="3"
-      max="25"
-    />
-  </div>
+    <div class="form-group">
+      <label for="elevation-gain">獲得標高 (m)</label>
+      <input
+        id="elevation-gain"
+        type="number"
+        [(ngModel)]="elevationGainM"
+        (input)="calculate()"
+        min="0"
+      />
+    </div>
 
-  <div class="form-group">
-    <label for="power-watts">平均パワー (W)</label>
-    <input
-      id="power-watts"
-      type="number"
-      [(ngModel)]="powerWatts"
-      (input)="calculate()"
-      min="50"
-      max="600"
-    />
-  </div>
+    <div class="form-group">
+      <label for="rider-weight">ライダー体重 (kg)</label>
+      <input
+        id="rider-weight"
+        type="number"
+        [(ngModel)]="riderWeightKg"
+        (input)="calculate()"
+        min="30"
+        max="150"
+      />
+    </div>
 
-  <div class="form-group">
-    <label for="distance-km">距離 (km)</label>
-    <input
-      id="distance-km"
-      type="number"
-      step="0.1"
-      [(ngModel)]="distanceKm"
-      (input)="calculate()"
-      min="0.1"
-    />
-  </div>
+    <div class="form-group">
+      <label for="bike-weight">自転車重量 (kg)</label>
+      <input
+        id="bike-weight"
+        type="number"
+        [(ngModel)]="bikeWeightKg"
+        (input)="calculate()"
+        min="3"
+        max="25"
+      />
+    </div>
 
-  <div class="form-group">
-    <label for="elevation-gain">獲得標高 (m)</label>
-    <input
-      id="elevation-gain"
-      type="number"
-      [(ngModel)]="elevationGainM"
-      (input)="calculate()"
-      min="0"
-    />
+    <div class="form-group form-group-wide">
+      <label for="power-watts">平均パワー (W)</label>
+      <input
+        id="power-watts"
+        type="number"
+        [(ngModel)]="powerWatts"
+        (input)="calculate()"
+        min="50"
+        max="600"
+      />
+    </div>
   </div>
 
   <button type="button" class="calc-btn" (click)="calculate()">
